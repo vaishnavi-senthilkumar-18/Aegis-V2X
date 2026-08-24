@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "Aegis-V2X"
+    orgId: 1
+    folder: "Aegis-V2X"
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards

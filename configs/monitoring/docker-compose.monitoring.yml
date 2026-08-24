@@ -1,0 +1,35 @@
+version: "3.9"
+
+# Standalone Prometheus + Grafana stack for local/dev monitoring of the
+# Aegis-V2X backend. Run alongside the backend (see backend/README.md);
+# not part of the main `docker-compose.yml` so contributors without
+# Docker experience can still run `uvicorn` directly without pulling in
+# monitoring infrastructure.
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - aegis-monitoring
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=aegis
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - aegis-monitoring
+
+networks:
+  aegis-monitoring:
+    driver: bridge

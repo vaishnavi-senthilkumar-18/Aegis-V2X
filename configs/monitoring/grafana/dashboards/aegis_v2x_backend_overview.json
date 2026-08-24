@@ -1,0 +1,75 @@
+{
+  "title": "Aegis-V2X Backend Overview",
+  "uid": "aegis-v2x-backend-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Trust Score Distribution (T_t)",
+      "type": "heatmap",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "sum(increase(aegis_trust_score_bucket[5m])) by (le)", "legendFormat": "{{le}}" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Criticality Score Distribution (C_t)",
+      "type": "heatmap",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "sum(increase(aegis_criticality_score_bucket[5m])) by (le)", "legendFormat": "{{le}}" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Latest Prediction Horizon (H_t)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "targets": [{ "expr": "aegis_prediction_horizon_latest" }]
+    },
+    {
+      "id": 4,
+      "title": "FSDP Actions (rate, by action)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 6, "y": 8 },
+      "targets": [
+        { "expr": "sum(rate(aegis_fsdp_decisions_total[5m])) by (action)", "legendFormat": "{{action}}" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Ingested Frames (rate, by source)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 8 },
+      "targets": [
+        { "expr": "sum(rate(aegis_ingested_frames_total[5m])) by (source)", "legendFormat": "{{source}}" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "HTTP Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 14 },
+      "targets": [
+        { "expr": "sum(rate(http_requests_total[5m])) by (handler, status)", "legendFormat": "{{handler}} [{{status}}]" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "HTTP P95 Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 14 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, handler))",
+          "legendFormat": "{{handler}}"
+        }
+      ]
+    }
+  ]
+}
