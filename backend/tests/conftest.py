@@ -20,14 +20,20 @@ os.environ.setdefault(
 )
 os.environ["AEGIS_SKIP_DASHBOARD_MOUNT"] = "1"
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session, sessionmaker
+# These imports must come after the os.environ lines above -- app.main (and
+# anything importing app.core.config) reads DATABASE_URL/settings at import
+# time, so importing it first would bake in the wrong database. flake8's
+# E402 ("module level import not at top of file") doesn't know that, hence
+# the noqa on each: reordering to satisfy it would break the test database
+# isolation this file exists to provide.
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import create_engine, text  # noqa: E402
+from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 
-from app.core.config import get_settings
-from app.core.database import Base, get_db
-from app.main import app
+from app.core.config import get_settings  # noqa: E402
+from app.core.database import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
 
 get_settings.cache_clear()
 settings = get_settings()

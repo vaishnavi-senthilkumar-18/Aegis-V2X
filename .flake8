@@ -1,4 +1,9 @@
 [flake8]
 max-line-length = 100
 extend-ignore = E203, W503
-exclude = .git,__pycache__,.venv,build,dist
+exclude = .git,__pycache__,.venv,build,dist,backend/alembic/versions
+# backend/alembic/versions/ holds Alembic's machine-generated migration
+# files (`alembic revision --autogenerate`), which routinely violate
+# line-length/indentation rules as a normal side effect of codegen --
+# excluded rather than hand-reformatted, since hand-editing a migration
+# file risks silently changing what it actually does to the schema.
