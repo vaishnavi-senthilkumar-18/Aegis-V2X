@@ -9,7 +9,11 @@ import pytest
 
 from ai.twintrust_ap.fsdp import CommunicationAction, CriticalityBin, TrustBin
 from simulation.annotation.decision_labeler import BootstrapFSDP, BootstrapTAHS
-from simulation.annotation.trust_criticality_labeler import CriticalityWeights, TrustCriticalityLabeler, TrustWeights
+from simulation.annotation.trust_criticality_labeler import (
+    CriticalityWeights,
+    TrustCriticalityLabeler,
+    TrustWeights,
+)
 
 
 def test_trust_weights_must_sum_to_one():
@@ -19,19 +23,34 @@ def test_trust_weights_must_sum_to_one():
 
 def test_criticality_weights_must_sum_to_one():
     with pytest.raises(ValueError):
-        CriticalityWeights(alpha_relative_speed=0.5, alpha_blockage_prob=0.5, alpha_sync_age=0.5,
-                            alpha_channel_degradation=0.5, alpha_traffic_density=0.5)
+        CriticalityWeights(
+            alpha_relative_speed=0.5,
+            alpha_blockage_prob=0.5,
+            alpha_sync_age=0.5,
+            alpha_channel_degradation=0.5,
+            alpha_traffic_density=0.5,
+        )
 
 
 def test_default_weights_match_configs_model_yaml():
     """Defaults must mirror configs/model.yaml exactly (frozen, Phase 1)."""
     tw = TrustWeights()
-    assert (tw.w_error, tw.w_uncertainty, tw.w_sync_age, tw.w_comm_quality) == (0.35, 0.25, 0.20, 0.20)
+    assert (tw.w_error, tw.w_uncertainty, tw.w_sync_age, tw.w_comm_quality) == (
+        0.35,
+        0.25,
+        0.20,
+        0.20,
+    )
     assert tw.temperature == 0.8
 
     cw = CriticalityWeights()
-    assert (cw.alpha_relative_speed, cw.alpha_blockage_prob, cw.alpha_sync_age,
-            cw.alpha_channel_degradation, cw.alpha_traffic_density) == (0.25, 0.25, 0.15, 0.20, 0.15)
+    assert (
+        cw.alpha_relative_speed,
+        cw.alpha_blockage_prob,
+        cw.alpha_sync_age,
+        cw.alpha_channel_degradation,
+        cw.alpha_traffic_density,
+    ) == (0.25, 0.25, 0.15, 0.20, 0.15)
 
 
 def test_trust_is_bounded_in_zero_one_across_input_grid():
@@ -46,10 +65,18 @@ def test_trust_is_bounded_in_zero_one_across_input_grid():
 
 def test_trust_increases_as_error_uncertainty_age_decrease_and_quality_increases():
     labeler = TrustCriticalityLabeler()
-    bad, _ = labeler.compute_trust(prediction_error=0.9, prediction_uncertainty=0.9,
-                                    sync_age_normalized=0.9, comm_quality_normalized=0.1)
-    good, _ = labeler.compute_trust(prediction_error=0.1, prediction_uncertainty=0.1,
-                                     sync_age_normalized=0.1, comm_quality_normalized=0.9)
+    bad, _ = labeler.compute_trust(
+        prediction_error=0.9,
+        prediction_uncertainty=0.9,
+        sync_age_normalized=0.9,
+        comm_quality_normalized=0.1,
+    )
+    good, _ = labeler.compute_trust(
+        prediction_error=0.1,
+        prediction_uncertainty=0.1,
+        sync_age_normalized=0.1,
+        comm_quality_normalized=0.9,
+    )
     assert good > bad
 
 
@@ -63,6 +90,7 @@ def test_criticality_is_bounded_and_monotonic_in_each_feature():
 
 
 # -- Bootstrap TAHS/FSDP invariants, per docs/interfaces.md ------------------------
+
 
 def test_bootstrap_tahs_horizon_is_always_from_discrete_set():
     tahs = BootstrapTAHS()

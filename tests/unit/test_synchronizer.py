@@ -24,12 +24,16 @@ def test_synchronizer_within_tolerance_produces_sync_result():
     csi_buf = TimestampedBuffer()
     csi_buf.extend([(0.000, {"snr_db": 20.0}), (0.100, {"snr_db": 21.0})])
     gps_buf = TimestampedBuffer()
-    gps_buf.extend([(0.003, {"timestamp": 0.003, "lat": 1.0}), (0.101, {"timestamp": 0.101, "lat": 1.0})])
+    gps_buf.extend(
+        [(0.003, {"timestamp": 0.003, "lat": 1.0}), (0.101, {"timestamp": 0.101, "lat": 1.0})]
+    )
 
     sync.register_stream("csi", csi_buf, is_anchor=True)
     sync.register_stream("gps", gps_buf)
 
-    results, violations = StreamSynchronizer.split_results(sync.synchronize(scene_id="SceneTest", vehicle_id=1))
+    results, violations = StreamSynchronizer.split_results(
+        sync.synchronize(scene_id="SceneTest", vehicle_id=1)
+    )
 
     assert len(violations) == 0
     assert len(results) == 2
@@ -49,7 +53,9 @@ def test_synchronizer_out_of_tolerance_is_flagged_not_silently_dropped():
     sync.register_stream("csi", csi_buf, is_anchor=True)
     sync.register_stream("gps", gps_buf)
 
-    results, violations = StreamSynchronizer.split_results(sync.synchronize(scene_id="SceneTest", vehicle_id=1))
+    results, violations = StreamSynchronizer.split_results(
+        sync.synchronize(scene_id="SceneTest", vehicle_id=1)
+    )
 
     assert len(results) == 0
     assert len(violations) == 1
