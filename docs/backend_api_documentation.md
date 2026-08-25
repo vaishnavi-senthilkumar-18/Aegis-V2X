@@ -2,7 +2,7 @@
 
 **Phase:** 3 — Backend & Dashboard
 **Lead:** Logapriya
-**Status:** Implemented, tested (38/38 pytest), verified against live PostgreSQL 16
+**Status:** Implemented, tested (49/49 pytest — the original 38 plus bulk ingestion and API-key auth added 2026-08-25), verified against live PostgreSQL 16
 **Note:** This document reflects the **2026-08-15 full rebuild** of Phase 3 after the
 original `Aegis-V2X/` working folder was lost. Schema, API contracts, and design
 decisions are unchanged from the original delivery — see §8 for what happened and
@@ -127,7 +127,7 @@ documentation: `/api/docs` (Swagger) or `/api/redoc`.
 |---|---|
 | Health | `GET /health` |
 | Scenes | `POST /scenes`, `GET /scenes`, `GET /scenes/{id}`, `POST /scenes/{id}/vehicles`, `GET /scenes/{id}/vehicles` |
-| Frames | `POST /frames`, `GET /frames`, `GET /frames/{id}`, `GET /frames/stats/unsynchronized-count`, `GET /frames/scene/{scene_id}/latest-per-vehicle` |
+| Frames | `POST /frames`, `POST /frames/bulk`, `GET /frames`, `GET /frames/{id}`, `GET /frames/stats/unsynchronized-count`, `GET /frames/scene/{scene_id}/latest-per-vehicle` |
 | Trust | `POST /trust`, `GET /trust`, `GET /trust/frame/{frame_id}` |
 | Criticality | `POST /criticality`, `GET /criticality`, `GET /criticality/frame/{frame_id}` |
 | Decisions | `POST /decisions`, `GET /decisions`, `GET /decisions/frame/{frame_id}`, `GET /decisions/stats/action-distribution` |
@@ -142,6 +142,32 @@ against the parent frame; duplicate records per frame return `409`).
 `/frames/scene/.../latest-per-vehicle`) are registered before the
 parameterized `/frames/{frame_id}` route — reversing this order would
 shadow the literal routes, since Starlette matches in declaration order.
+
+**Bulk ingestion:** `POST /frames/bulk` accepts `{"frames": [...]}`
+(1-2000 `FrameCreate` items) and inserts the whole batch in a single
+transaction (`app/crud/frame.py::create_frames_bulk`) instead of one round
+trip per frame -- added 2026-08-25 to close the gap flagged in
+`claude/project_status.md`'s "Open architecture questions" item 2, since
+Phase 2's target scale (10,000-20,000 frames across 100-150 scenes) made
+one-row-per-call ingestion impractical. It shares the exact same
+sync-tolerance logic as `POST /frames` (both call `_build_frame`), so
+out-of-tolerance frames within a batch are stored and flagged, never
+rejected. Registered as a literal route (`/frames/bulk`) before the
+parameterized `/frames/{frame_id}` route, per the same route-ordering rule.
+
+**Authentication:** write endpoints (`POST`/`PATCH` -- every one listed in
+the table above except the `GET`s) are gated behind an optional
+`X-API-Key` header, added 2026-08-25 (`app/core/security.py::require_api_key`).
+`settings.api_key` is unset by default, in which case the gate is a no-op
+and writes stay unauthenticated, matching the backend's original
+local-dev-only scope. Setting the `API_KEY` environment variable (see
+`backend/.env.example`) turns the gate on for every write endpoint at
+once; requests missing the header or sending the wrong value get `401`.
+`GET` endpoints are never gated. This was added because the backend, once
+exposed beyond localhost via the VS Code Dev Tunnel used for the Lovable
+dashboard preview, had no way to stop an arbitrary caller with the tunnel
+URL from writing data -- see `claude/project_status.md`'s "Open
+architecture questions" item 3.
 
 ## 5. Monitoring
 
@@ -208,6 +234,26 @@ plainly (e.g. the Experiments page before Phase 6/7 populates it).
   page errors, screenshots reviewed for visual correctness.
 * Manual exercise of every endpoint via `curl` (synthetic scene
   generation, sync-health stats, latest-per-vehicle, action distribution).
+
+### Verification performed (2026-08-25 addendum: bulk ingestion + API-key auth)
+
+* `backend/tests/test_frames_bulk.py` (5 tests) and
+  `backend/tests/test_api_key_auth.py` (6 tests) added, covering: bulk
+  insert correctness, out-of-sync frames flagged not rejected within a
+  batch, empty-list and >2000-item rejection (422), the `/frames/bulk`
+  route-ordering regression, unauthenticated writes staying unauthenticated
+  by default, missing/wrong/correct `X-API-Key` handling once `API_KEY` is
+  set, and `GET` endpoints staying open either way.
+* `pytest`: **49/49 passing** (the original 38 plus these 11) -- run for
+  real, not just syntax-checked, against a genuine local PostgreSQL 16.15
+  instance (a portable build stood up for this verification pass, since
+  the previous session's device-bridge sandbox had no way to run Postgres
+  at all). `ruff check .`: clean.
+* Anyone continuing this work on Logapriya's own machine should still run
+  `pytest` once against her regular local Postgres/`.venv` before treating
+  this as fully closed on that environment specifically -- this pass
+  confirms the code is correct, not that her particular local setup is
+  configured to match.
 
 ### Bugs found and fixed during this rebuild
 

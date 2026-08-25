@@ -27,6 +27,8 @@ class Settings(BaseSettings):
             statically by the backend itself.
         api_v1_prefix: URL prefix for all versioned REST endpoints.
         project_name: Human-readable service name, used in OpenAPI docs.
+        api_key: Optional shared secret gating write endpoints; unset means
+            writes stay unauthenticated (see `app.core.security`).
     """
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -37,6 +39,13 @@ class Settings(BaseSettings):
     cors_allow_origins: str = "http://localhost:5173,http://localhost:8000"
     api_v1_prefix: str = "/api/v1"
     project_name: str = "Aegis-V2X Backend"
+    api_key: str | None = None
+    """Shared secret required via the `X-API-Key` header on write endpoints
+    (POST/PATCH). Unset by default, meaning writes are unauthenticated,
+    matching the backend's original local-dev-only scope. Set this once the
+    backend is exposed beyond localhost (e.g. the VS Code Dev Tunnel used
+    for the Lovable dashboard preview) -- see `app.core.security.require_api_key`.
+    """
 
     @property
     def cors_origins_list(self) -> list[str]:

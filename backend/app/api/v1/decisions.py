@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_api_key
 from app.crud import decision as decision_crud
 from app.crud import frame as frame_crud
 from app.schemas.decision import (
@@ -21,7 +22,10 @@ from app.schemas.decision import (
 router = APIRouter(prefix="/decisions", tags=["decisions"])
 
 
-@router.post("", response_model=DecisionRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=DecisionRead, status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
 def create_decision(payload: DecisionCreate, db: Session = Depends(get_db)) -> DecisionRead:
     """Record the joint TAHS + FSDP decision for a frame."""
     if frame_crud.get_frame(db, payload.frame_id) is None:

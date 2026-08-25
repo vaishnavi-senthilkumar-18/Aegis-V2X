@@ -28,12 +28,15 @@ logger = logging.getLogger(__name__)
 SYNC_TOLERANCE_MS = 10.0
 
 
-def create_frame(db: Session, payload: FrameCreate) -> Frame:
-    """Insert a new frame, computing sync offset/validity, and return it.
+def _build_frame(payload: FrameCreate) -> Frame:
+    """Construct a `Frame` ORM instance with sync fields computed, unsaved.
 
-    Records the `aegis_ingested_frames_total{source=...}` metric here (not
-    only in the API handler) so any code path that calls this function —
-    including the synthetic data generator — contributes to the metric.
+    Shared by `create_frame` and `create_frames_bulk` so both single and
+    bulk ingestion apply the exact same Ch. 9 synchronization-tolerance
+    logic and out-of-tolerance warning. Does not touch the session — the
+    caller is responsible for `db.add`/`db.add_all` and committing, so
+    bulk ingestion can build every row before issuing a single commit
+    instead of one round trip per frame.
     """
     data = payload.model_dump()
     sim_ts = data["simulation_timestamp"]
@@ -51,18 +54,55 @@ def create_frame(db: Session, payload: FrameCreate) -> Frame:
             SYNC_TOLERANCE_MS,
         )
 
-    frame = Frame(
+    return Frame(
         **data,
         sync_timestamp=(sim_ts + wireless_ts) / 2.0,
         sync_offset_ms=sync_offset_ms,
         is_sync_valid=is_sync_valid,
     )
+
+
+def create_frame(db: Session, payload: FrameCreate) -> Frame:
+    """Insert a new frame, computing sync offset/validity, and return it.
+
+    Records the `aegis_ingested_frames_total{source=...}` metric here (not
+    only in the API handler) so any code path that calls this function —
+    including the synthetic data generator — contributes to the metric.
+    """
+    frame = _build_frame(payload)
     db.add(frame)
     db.commit()
     db.refresh(frame)
 
     ingested_frames_counter.labels(source=frame.source).inc()
     return frame
+
+
+def create_frames_bulk(db: Session, payloads: list[FrameCreate]) -> list[Frame]:
+    """Insert many frames in a single transaction and return them.
+
+    Built for Phase 2's target ingestion volume (10,000-20,000 frames
+    across 100-150 scenes — see `claude/project_status.md`'s "Open
+    architecture questions" item 2), where the original one-row-per-call
+    `create_frame` (one HTTP round trip + one commit per frame) would be
+    far too slow. Every row's `id` is available immediately after
+    `db.add_all` without a post-commit refresh, since `Frame.id` uses a
+    client-side `default=uuid.uuid4` (see `app.models.frame`) rather than
+    a server-generated default — so this needs exactly one round trip to
+    Postgres for the whole batch, not one per frame.
+
+    Sync-tolerance computation and the out-of-tolerance warning are
+    identical to `create_frame` (both go through `_build_frame`), so
+    partially-desynchronized real datasets are still stored and flagged,
+    never silently rejected, matching the existing single-frame contract.
+    """
+    frames = [_build_frame(payload) for payload in payloads]
+    db.add_all(frames)
+    db.commit()
+
+    for frame in frames:
+        ingested_frames_counter.labels(source=frame.source).inc()
+    return frames
 
 
 def get_frame(db: Session, frame_id: uuid.UUID) -> Frame | None:

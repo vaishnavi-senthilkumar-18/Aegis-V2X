@@ -9,13 +9,17 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_api_key
 from app.crud import experiment as experiment_crud
 from app.schemas.experiment import ExperimentCreate, ExperimentRead, ExperimentUpdate
 
 router = APIRouter(prefix="/experiments", tags=["experiments"])
 
 
-@router.post("", response_model=ExperimentRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=ExperimentRead, status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
 def create_experiment(payload: ExperimentCreate, db: Session = Depends(get_db)) -> ExperimentRead:
     """Register a new named, config-versioned research run."""
     try:
@@ -46,7 +50,10 @@ def get_experiment(experiment_id: uuid.UUID, db: Session = Depends(get_db)) -> E
     return ExperimentRead.model_validate(experiment)
 
 
-@router.patch("/{experiment_id}", response_model=ExperimentRead)
+@router.patch(
+    "/{experiment_id}", response_model=ExperimentRead,
+    dependencies=[Depends(require_api_key)],
+)
 def update_experiment(
     experiment_id: uuid.UUID, payload: ExperimentUpdate, db: Session = Depends(get_db)
 ) -> ExperimentRead:

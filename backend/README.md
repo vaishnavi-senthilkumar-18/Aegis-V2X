@@ -60,6 +60,44 @@ curl -X POST http://localhost:8000/api/v1/synthetic/scenes \
   -d '{"scene_code": "IntersectionDemo01", "num_vehicles": 5, "num_frames": 200}'
 ```
 
+## Authentication (optional)
+
+Write endpoints (`POST`/`PATCH`) are gated behind an optional shared
+`X-API-Key` header, implemented in `app/core/security.py`. By default
+`API_KEY` is unset in `.env`/the environment, which makes
+`require_api_key` a no-op — writes stay unauthenticated, matching the
+original local-dev-only scope. `GET` endpoints are never gated.
+
+To turn the gate on (e.g. before exposing the backend beyond localhost,
+such as through a dev tunnel):
+
+```bash
+# in backend/.env
+API_KEY=some-shared-secret
+```
+
+Then every write request must include the header:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/scenes \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: some-shared-secret" \
+  -d '{"scene_code": "Demo01"}'
+```
+
+A request without the header, or with the wrong value, gets `401`.
+
+## Bulk frame ingestion
+
+`POST /frames/bulk` accepts `{"frames": [...]}` (1-2000 `FrameCreate`
+objects) and inserts them all in a single database transaction, instead of
+one HTTP round trip per frame — built for Phase 2's target dataset scale
+(10,000-20,000 frames across 100-150 scenes). Out-of-sync frames within
+the batch are stored and flagged (`is_sync_valid=False`), never rejected,
+same as the single-frame `POST /frames`. See
+`app/crud/frame.py::create_frames_bulk` and
+`../docs/backend_api_documentation.md` §4 for the response shape.
+
 ## Testing
 
 ```bash

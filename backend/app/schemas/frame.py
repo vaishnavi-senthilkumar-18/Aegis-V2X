@@ -115,3 +115,27 @@ class UnsyncedCountResponse(BaseModel):
     total_frames: int
     unsynchronized_frames: int
     unsynchronized_ratio: float
+
+
+class FrameBulkCreate(BaseModel):
+    """Payload to ingest many frames in a single request.
+
+    Added to close the gap flagged in `claude/project_status.md`'s "Open
+    architecture questions" item 2: the original one-row-per-call
+    `POST /frames` was never load-tested at Phase 2's target dataset scale
+    (10,000-20,000 frames across 100-150 scenes). Capped at 2000 frames per
+    request -- large enough to meaningfully batch, small enough to keep a
+    single request's payload and transaction size reasonable; a full
+    100-150 scene dataset export should be chunked into multiple bulk
+    calls rather than sent as one giant request.
+    """
+
+    frames: list[FrameCreate] = Field(..., min_length=1, max_length=2000)
+
+
+class FrameBulkCreateResponse(BaseModel):
+    """Response summarizing a bulk ingestion call."""
+
+    created: int
+    unsynchronized: int
+    frame_ids: list[uuid.UUID]

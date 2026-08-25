@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_api_key
 from app.crud import criticality as criticality_crud
 from app.crud import frame as frame_crud
 from app.schemas.criticality import CriticalityRecordCreate, CriticalityRecordRead
@@ -16,7 +17,10 @@ from app.schemas.criticality import CriticalityRecordCreate, CriticalityRecordRe
 router = APIRouter(prefix="/criticality", tags=["criticality"])
 
 
-@router.post("", response_model=CriticalityRecordRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=CriticalityRecordRead, status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
 def create_criticality_record(
     payload: CriticalityRecordCreate, db: Session = Depends(get_db)
 ) -> CriticalityRecordRead:

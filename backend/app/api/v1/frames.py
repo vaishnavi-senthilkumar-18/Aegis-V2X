@@ -16,17 +16,56 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_api_key
 from app.crud import frame as frame_crud
-from app.schemas.frame import FrameCreate, FrameRead, LatestVehicleFrame, UnsyncedCountResponse
+from app.schemas.frame import (
+    FrameBulkCreate,
+    FrameBulkCreateResponse,
+    FrameCreate,
+    FrameRead,
+    LatestVehicleFrame,
+    UnsyncedCountResponse,
+)
 
 router = APIRouter(prefix="/frames", tags=["frames"])
 
 
-@router.post("", response_model=FrameRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=FrameRead, status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
 def create_frame(payload: FrameCreate, db: Session = Depends(get_db)) -> FrameRead:
     """Ingest one synchronized multimodal observation."""
     frame = frame_crud.create_frame(db, payload)
     return FrameRead.model_validate(frame)
+
+
+@router.post(
+    "/bulk", response_model=FrameBulkCreateResponse, status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
+def create_frames_bulk(
+    payload: FrameBulkCreate, db: Session = Depends(get_db)
+) -> FrameBulkCreateResponse:
+    """Ingest many synchronized multimodal observations in one request.
+
+    A literal-path route (`/frames/bulk`) registered before the
+    parameterized `/frames/{frame_id}` route, same ordering rule as the
+    other literal routes below (see module docstring) -- otherwise
+    `/frames/bulk` would be shadowed and matched as an invalid frame-id
+    UUID instead.
+
+    Built for Phase 2's target ingestion volume; see
+    `app.crud.frame.create_frames_bulk` for why this is a single
+    transaction rather than N calls to `create_frame`.
+    """
+    frames = frame_crud.create_frames_bulk(db, payload.frames)
+    unsynchronized = sum(1 for f in frames if not f.is_sync_valid)
+    return FrameBulkCreateResponse(
+        created=len(frames),
+        unsynchronized=unsynchronized,
+        frame_ids=[f.id for f in frames],
+    )
 
 
 @router.get("", response_model=list[FrameRead])

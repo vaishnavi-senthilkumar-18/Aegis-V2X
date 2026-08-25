@@ -12,13 +12,17 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_api_key
 from app.schemas.synthetic import SyntheticSceneRequest, SyntheticSceneResponse
 from app.services.synthetic_data_service import generate_synthetic_scene
 
 router = APIRouter(prefix="/synthetic", tags=["synthetic"])
 
 
-@router.post("/scenes", response_model=SyntheticSceneResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/scenes", response_model=SyntheticSceneResponse, status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
 def create_synthetic_scene(
     payload: SyntheticSceneRequest, db: Session = Depends(get_db)
 ) -> SyntheticSceneResponse:
