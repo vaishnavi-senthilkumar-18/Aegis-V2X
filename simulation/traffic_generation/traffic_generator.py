@@ -51,11 +51,14 @@ class TrafficGenerator:
     """Spawns vehicles/pedestrians/RSUs for one scene, per the frozen density model."""
 
     def __init__(self, world: "carla.World", traffic_manager: "carla.TrafficManager",
-                 vehicles_per_scene_range: Tuple[int, int] = (30, 60), seed: int = 42):
+                 vehicles_per_scene_range: Tuple[int, int] = (30, 60), seed: int = 42,
+                 center_location: "carla.Location" = None, max_radius_m: float = None):
         self._world = world
         self._tm = traffic_manager
         self._vehicles_per_scene_range = vehicles_per_scene_range
         self._rng = random.Random(seed)
+        self._center_location = center_location
+        self._max_radius_m = max_radius_m
 
     def _vehicle_count_for_density(self, density: str) -> int:
         lo, hi = self._vehicles_per_scene_range
@@ -72,6 +75,10 @@ class TrafficGenerator:
                                if int(bp.get_attribute("number_of_wheels")) == 4]
 
         spawn_points = self._world.get_map().get_spawn_points()
+        if self._center_location is not None and self._max_radius_m is not None:
+            spawn_points = [p for p in spawn_points if
+                            ((p.location.x - self._center_location.x) ** 2 +
+                             (p.location.y - self._center_location.y) ** 2) ** 0.5 <= self._max_radius_m]
         self._rng.shuffle(spawn_points)
 
         target_count = min(self._vehicle_count_for_density(density), len(spawn_points))
@@ -97,10 +104,15 @@ class TrafficGenerator:
     def spawn_pedestrians(self, density: str, pedestrian_ratio: float = 0.5):
         """Spawns pedestrians at `pedestrian_ratio` x the vehicle count for this density.
 
-        The frozen config does not specify a separate pedestrian count range,
-        so this is derived from the vehicle count as a documented, deterministic
-        rule rather than an independently invented magic number.
+        KNOWN ISSUE (flagged 2026-09-05): get_random_location_from_navigation()
+        segfaults the whole client process on this CARLA install/map combo,
+        very likely a missing/unbuilt pedestrian nav-mesh for this package.
+        Pedestrian spawning is disabled until this is root-caused. Vehicles
+        and RSUs are unaffected and spawn normally.
         """
+        return [], []
+
+    def _spawn_pedestrians_DISABLED(self, density: str, pedestrian_ratio: float = 0.5):
         blueprint_library = self._world.get_blueprint_library()
         walker_blueprints = blueprint_library.filter("walker.pedestrian.*")
         controller_bp = blueprint_library.find("controller.ai.walker")
@@ -151,6 +163,13 @@ class TrafficGenerator:
         if placement == "intersection_corners":
             junctions = {wp.get_junction().id: wp for wp, _ in topology if wp.is_junction and wp.get_junction()}
             candidate_points = [wp.transform.location for wp in junctions.values()] or candidate_points
+
+        if self._center_location is not None and self._max_radius_m is not None:
+            filtered = [p for p in candidate_points if
+                       ((p.x - self._center_location.x) ** 2 +
+                        (p.y - self._center_location.y) ** 2) ** 0.5 <= self._max_radius_m]
+            if filtered:
+                candidate_points = filtered
 
         self._rng.shuffle(candidate_points)
         if not candidate_points:

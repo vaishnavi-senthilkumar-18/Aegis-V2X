@@ -1,4 +1,4 @@
-# Aegis-V2X — Simulation stack (Phase 2, owner: Haridharani)
+# Aegis-V2X — Simulation stack (Phase 2, owner: Vaishnavi)
 -r base.txt
 carla==0.9.15
 # NVIDIA Sionna RT installed per vendor instructions (requires TensorFlow + CUDA);

@@ -41,6 +41,34 @@ _TEMPLATE_MESH = {
     "default": "simulation/sionna_configs/static_scenes/templates/rsu_pole.ply",
 }
 
+# --- Real per-map coordinate offsets (queried from live CARLA, 2026-09-05) ---
+MAP_OFFSETS = {
+    "Town04":   (-24.7, 80.4, 0.0),
+    "Town10HD": (4.0, -28.1, 0.0),
+}
+TOWN03_JUNCTION_ANCHOR = (94.1, -73.4)
+TOWN03_ROUNDABOUT_ANCHOR = (-0.4, 23.8)
+TOWN03_JUNCTION_LOCAL = (-60.0, 0.0)
+TOWN03_ROUNDABOUT_LOCAL = (60.0, 0.0)
+
+
+def _apply_map_offset(map_name, center_xyz):
+    import math
+    x, y, z = center_xyz
+    if map_name == "Town03":
+        d_j = math.hypot(x - TOWN03_JUNCTION_ANCHOR[0], y - TOWN03_JUNCTION_ANCHOR[1])
+        d_r = math.hypot(x - TOWN03_ROUNDABOUT_ANCHOR[0], y - TOWN03_ROUNDABOUT_ANCHOR[1])
+        if d_j <= d_r:
+            ax, ay = TOWN03_JUNCTION_ANCHOR
+            lx, ly = TOWN03_JUNCTION_LOCAL
+        else:
+            ax, ay = TOWN03_ROUNDABOUT_ANCHOR
+            lx, ly = TOWN03_ROUNDABOUT_LOCAL
+        return (x - ax + lx, y - ay + ly, z)
+    ox, oy, oz = MAP_OFFSETS.get(map_name, (0.0, 0.0, 0.0))
+    return (x + ox, y + oy, z + oz)
+
+
 
 class GeometryAdapterError(RuntimeError):
     """Raised when a required static scene or template asset is missing."""
@@ -73,7 +101,12 @@ class GeometryAdapter:
     def build_frame_scene(self, map_name: str, geometry_snapshot: List[dict]) -> Scene:
         scene = self.load_static_scene(map_name)
         scene.edit(remove=[name for name in scene.objects.keys() if name.startswith("dyn_")])
-        scene.edit(add=[self._to_scene_object(entry) for entry in geometry_snapshot])
+        offset_snapshot = []
+        for entry in geometry_snapshot:
+            entry = dict(entry)
+            entry["center_xyz"] = _apply_map_offset(map_name, entry["center_xyz"])
+            offset_snapshot.append(entry)
+        scene.edit(add=[self._to_scene_object(entry) for entry in offset_snapshot])
         return scene
 
     def _to_scene_object(self, entry: dict) -> SceneObject:
