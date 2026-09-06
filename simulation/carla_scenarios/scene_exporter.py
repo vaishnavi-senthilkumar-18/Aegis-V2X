@@ -136,7 +136,7 @@ class SceneExporter:
     def _write_sensor_reading(self, frame_dir: Path, vehicle_id: int, reading: SensorReading) -> None:
         prefix = frame_dir / f"vehicle{vehicle_id}_{reading.sensor_type}"
         if reading.sensor_type in ("lidar", "camera"):
-            np.savez_compressed(f"{prefix}.npz", data=reading.data, timestamp=reading.timestamp, frame=reading.frame)
+            np.savez(f"{prefix}.npz", data=reading.data, timestamp=reading.timestamp, frame=reading.frame)
         else:
             payload = {"timestamp": reading.timestamp, "frame": reading.frame, **reading.data}
             with open(f"{prefix}.json", "w") as fh:

@@ -1,0 +1,80 @@
+2026-09-06 06:06:14,853 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:25,344 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:06:25,583 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:06:25,583 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:06:25,784 | INFO     | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene junction_sparse_rain_Scene00: 12000 ticks, exporting every 10 ticks (10.0 Hz), map=Town03
+2026-09-06 06:17:27,794 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:17:27,794 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 0 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 74, in run_single_scene
+    exporter.export_frame(frame, timestamp)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 69, in export_frame
+    self._write_physical_frame(frame, vehicle_states, readings_by_vehicle)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 134, in _write_physical_frame
+    self._write_sensor_reading(frame_dir, vehicle_id, reading)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 139, in _write_sensor_reading
+    np.savez(f"{prefix}.npz", data=reading.data, timestamp=reading.timestamp, frame=reading.frame)
+  File "<__array_function__ internals>", line 200, in savez
+  File "/venv/carla_py37/lib/python3.8/site-packages/numpy/lib/npyio.py", line 615, in savez
+    _savez(file, args, kwds, False)
+  File "/venv/carla_py37/lib/python3.8/site-packages/numpy/lib/npyio.py", line 719, in _savez
+    format.write_array(fid, val,
+  File "/venv/carla_py37/lib/python3.8/site-packages/numpy/lib/format.py", line 728, in write_array
+    fp.write(chunk.tobytes('C'))
+  File "/venv/carla_py37/lib/python3.8/zipfile.py", line 1143, in write
+    self._fileobj.write(data)
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:17:27,796 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:17:47,530 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:17:47,923 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:17:47,923 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:17:51,216 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:17:51,216 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 1 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/sim2026-09-06 06:21:40,327 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:21:40,738 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:21:40,738 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:21:40,960 | INFO     | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene junction_sparse_rain_Scene11: 12000 ticks, exporting every 10 ticks (10.0 Hz), map=Town03
+2026-09-06 06:38:00,590 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:38:00,590 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 11 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 74, in run_single_scene
+    exporter.export_frame(frame, timestamp)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 69, in export_frame
+    self._write_physical_frame(frame, vehicle_states, readings_by_vehicle)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 127, in _write_physical_frame
+    frame_dir.mkdir(exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'datasets/raw/carla/junction_sparse_rain_Scene11/frame_126137'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:38:00,590 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:38:07,717 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:38:08,123 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:38:08,123 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:38:08,335 | INFO     | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene junction_sparse_rain_Scene12: 12000 ticks, exporting every 10 ticks (10.0 Hz), map=Town03

@@ -1,0 +1,384 @@
+2026-09-06 06:06:11,659 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:11,757 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 0 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:11,760 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:11,846 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 1 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:11,849 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:11,935 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 2 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:11,939 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,025 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 3 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,028 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,114 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 4 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,118 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,204 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 5 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,208 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,294 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 6 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,297 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,383 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 7 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,386 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,473 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 8 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,477 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,564 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 9 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,567 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,655 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 10 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,658 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,745 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 11 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,748 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,835 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 12 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,838 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:12,925 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 13 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:12,928 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:13,014 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 14 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:13,018 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:13,105 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 15 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:13,108 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:13,195 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 16 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:13,199 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:13,286 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 17 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:13,289 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:13,376 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 18 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+2026-09-06 06:06:13,380 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:06:13,466 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 19 of scenario 'highway_dense_fog' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 81, in connect
+    self._world = self._client.load_world(self._map_name)
+RuntimeError: Map 'Town06' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 48, in run_single_scene
+    with CarlaClientManager(server_cfg, map_name) as manager:
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 134, in __enter__
+    return self.connect()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 83, in connect
+    raise CarlaConnectionError(
+simulation.carla_scenarios.client.CarlaConnectionError: Could not connect to CARLA at 127.0.0.1:2000. Is the CARLA server running (./CarlaUE4.sh -RenderOffScreen)?
+
+real	0m3.166s
+user	0m2.123s
+sys	0m8.514s
