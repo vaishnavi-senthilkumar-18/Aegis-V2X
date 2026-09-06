@@ -78,3 +78,232 @@ TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
 2026-09-06 06:38:08,123 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
 2026-09-06 06:38:08,123 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
 2026-09-06 06:38:08,335 | INFO     | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene junction_sparse_rain_Scene12: 12000 ticks, exporting every 10 ticks (10.0 Hz), map=Town03
+2026-09-06 06:50:38,128 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:50:38,129 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 12 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 74, in run_single_scene
+    exporter.export_frame(frame, timestamp)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 69, in export_frame
+    self._write_physical_frame(frame, vehicle_states, readings_by_vehicle)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 134, in _write_physical_frame
+    self._write_sensor_reading(frame_dir, vehicle_id, reading)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 139, in _write_sensor_reading
+    np.savez(f"{prefix}.npz", data=reading.data, timestamp=reading.timestamp, frame=reading.frame)
+  File "<__array_function__ internals>", line 200, in savez
+  File "/venv/carla_py37/lib/python3.8/site-packages/numpy/lib/npyio.py", line 615, in savez
+    _savez(file, args, kwds, False)
+  File "/venv/carla_py37/lib/python3.8/site-packages/numpy/lib/npyio.py", line 719, in _savez
+    format.write_array(fid, val,
+  File "/venv/carla_py37/lib/python3.8/site-packages/numpy/lib/format.py", line 728, in write_array
+    fp.write(chunk.tobytes('C'))
+  File "/venv/carla_py37/lib/python3.8/zipfile.py", line 1143, in write
+    self._fileobj.write(data)
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:50:38,131 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:51:21,539 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:51:21,959 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:51:21,959 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:51:22,277 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:51:22,277 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 13 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene13'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:51:22,278 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:51:29,287 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:51:29,534 | WARNING  | aegis_v2x.simulation.traffic_generation | Requested 34 vehicles (sparse density), only spawned 33 (insufficient spawn points).
+2026-09-06 06:51:29,693 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 33 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:51:29,693 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:51:33,042 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:51:33,042 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 14 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene14'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:51:33,042 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:51:56,315 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:51:56,720 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:51:56,720 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:52:00,099 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:52:00,099 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 15 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene15'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:52:00,100 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:52:24,113 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:52:24,530 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:52:24,530 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:52:27,995 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:52:27,996 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 16 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene16'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:52:27,996 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:52:50,025 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:52:50,448 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:52:50,448 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:52:53,833 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:52:53,833 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 17 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene17'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:52:53,834 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:53:15,734 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:53:16,142 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 34 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:53:16,142 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:53:19,550 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:53:19,550 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 18 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene18'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+2026-09-06 06:53:19,550 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connecting to CARLA server at 127.0.0.1:2000
+2026-09-06 06:53:41,498 | INFO     | aegis_v2x.simulation.carla_scenarios.client | Connected. Map=Town03 synchronous_mode=True dt=0.0100s
+2026-09-06 06:53:41,740 | WARNING  | aegis_v2x.simulation.traffic_generation | Requested 34 vehicles (sparse density), only spawned 33 (insufficient spawn points).
+2026-09-06 06:53:41,896 | INFO     | aegis_v2x.simulation.traffic_generation | Scene populated: 33 vehicles, 0 pedestrians, 4 RSUs (density=sparse)
+2026-09-06 06:53:41,897 | INFO     | aegis_v2x.simulation.carla_scenarios.scenario_builder | Scenario 'junction_sparse_rain' built on map with weather='rain'
+2026-09-06 06:53:45,155 | INFO     | aegis_v2x.simulation.carla_scenarios.client | CARLA world cleaned up and settings restored.
+2026-09-06 06:53:45,156 | ERROR    | aegis_v2x.simulation.carla_scenarios.run_scenario | Scene 19 of scenario 'junction_sparse_rain' failed; continuing with next scene.
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 59, in run_single_scene
+    exporter = SceneExporter(manager.world, actors, sensor_rigs, scene_id, output_dir)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/scene_exporter.py", line 61, in __init__
+    self._output_dir.mkdir(parents=True, exist_ok=True)
+  File "/venv/carla_py37/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 28] No space left on device: 'datasets/raw/carla/junction_sparse_rain_Scene19'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 100, in main
+    run_single_scene(scene_index, global_cfg, scenario_cfg, args.output)
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/run_scenario.py", line 77, in run_single_scene
+    rig.destroy()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 137, in __exit__
+    self.cleanup()
+  File "/workspace/Aegis-V2X/simulation/carla_scenarios/client.py", line 121, in cleanup
+    actors = self._world.get_actors().filter("vehicle.*") + self._world.get_actors().filter("sensor.*") \
+TypeError: unsupported operand type(s) for +: 'ActorList' and 'ActorList'
+
+real	47m33.101s
+user	38m6.037s
+sys	167m57.037s
