@@ -1,0 +1,20 @@
+[project]
+name = "aegis-v2x-backend"
+version = "0.1.0"
+description = "Aegis-V2X Phase 3 backend: FastAPI + PostgreSQL API serving the Digital Twin data model, calibrated trust/criticality records, and TwinTrust-AP decisions."
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Alembic autogenerates migration files (formatting not ours to police); .venv
+# is local tooling, never linted as part of this project's own code.
+exclude = ["alembic/versions", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

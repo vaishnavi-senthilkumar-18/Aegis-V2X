@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: "aegis-v2x-backend"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend:8000"]
+        labels:
+          service: "aegis-v2x-backend"
+          environment: "development"
+
+  # Uncomment when running against a host-network backend instead of the
+  # docker-compose service name above (e.g. local `uvicorn` development):
+  # - job_name: "aegis-v2x-backend-local"
+  #   metrics_path: /metrics
+  #   static_configs:
+  #     - targets: ["host.docker.internal:8000"]

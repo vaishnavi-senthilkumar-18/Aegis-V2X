@@ -2,12 +2,7 @@
 
 import pytest
 
-from digital_twin.state import (
-    ChannelState,
-    DigitalTwinState,
-    EnvironmentalContext,
-    MobilityState,
-)
+from digital_twin.state import ChannelState, DigitalTwinState, EnvironmentalContext, MobilityState
 
 
 @pytest.fixture
