@@ -1,0 +1,1406 @@
+[
+  {
+    "vehicle_id": 147,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      4.3103156089782715,
+      -160.06044006347656,
+      0.06980928033590317
+    ],
+    "velocity_xyz": [
+      3.9598998569090327e-07,
+      4.197484138046548e-09,
+      -1.2615416049957275
+    ],
+    "acceleration_xyz": [
+      4.577350046020001e-05,
+      -2.166400463465834e-06,
+      21.138715744018555
+    ],
+    "heading_deg": -90.224853515625,
+    "speed_mps": 1.2615416049957897,
+    "road_id": 48,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 148,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -364.3880920410156,
+      30.064191818237305,
+      0.05556238070130348
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -0.368408203125,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1400,
+    "lane_id": 4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 149,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      194.09445190429688,
+      -248.6903533935547,
+      0.5736199021339417
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 178.40469360351562,
+    "speed_mps": 2.058000326156616,
+    "road_id": 955,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 150,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -365.8655700683594,
+      33.57374954223633,
+      0.057211246341466904
+    ],
+    "velocity_xyz": [
+      7.569278182018024e-07,
+      0.00011771505523938686,
+      -1.8931318521499634
+    ],
+    "acceleration_xyz": [
+      7.569278386654332e-05,
+      0.011771505698561668,
+      6.686842441558838
+    ],
+    "heading_deg": -0.368408203125,
+    "speed_mps": 1.8931318558098793,
+    "road_id": 1400,
+    "lane_id": 5,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 151,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -8.83758544921875,
+      49.01508331298828,
+      0.05898015946149826
+    ],
+    "velocity_xyz": [
+      -7.053264283740646e-08,
+      5.481941012241975e-10,
+      -1.7288439273834229
+    ],
+    "acceleration_xyz": [
+      -7.053264198475517e-06,
+      5.481940945628594e-08,
+      21.854734420776367
+    ],
+    "heading_deg": 89.71089935302734,
+    "speed_mps": 1.7288439273834242,
+    "road_id": 47,
+    "lane_id": 4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 152,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      322.6086120605469,
+      -246.67312622070312,
+      0.0638182982802391
+    ],
+    "velocity_xyz": [
+      7.332523477288078e-09,
+      2.8105120009058737e-07,
+      -1.5051343441009521
+    ],
+    "acceleration_xyz": [
+      -3.799931391768041e-06,
+      7.643052413186524e-07,
+      18.213844299316406
+    ],
+    "heading_deg": -0.394500732421875,
+    "speed_mps": 1.5051343441009783,
+    "road_id": 25,
+    "lane_id": 1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 153,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -510.619140625,
+      159.84310913085938,
+      0.05809327960014343
+    ],
+    "velocity_xyz": [
+      4.2711221226454654e-07,
+      2.6650066597966315e-09,
+      -1.8049166202545166
+    ],
+    "acceleration_xyz": [
+      4.271122088539414e-05,
+      2.665006775259826e-07,
+      15.508365631103516
+    ],
+    "heading_deg": 90.35750579833984,
+    "speed_mps": 1.8049166202545672,
+    "road_id": 41,
+    "lane_id": -3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 154,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      223.02505493164062,
+      -385.14300537109375,
+      0.05710664764046669
+    ],
+    "velocity_xyz": [
+      1.8758747444280743e-08,
+      -2.331724317627959e-06,
+      -1.8932301998138428
+    ],
+    "acceleration_xyz": [
+      1.8758747728497838e-06,
+      -0.0002331724390387535,
+      6.677007675170898
+    ],
+    "heading_deg": -179.57008361816406,
+    "speed_mps": 1.8932301998152787,
+    "road_id": 43,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 155,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -12.754473686218262,
+      -49.132835388183594,
+      0.05809308961033821
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -1.8049170970916748
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      15.508317947387695
+    ],
+    "heading_deg": 89.77515411376953,
+    "speed_mps": 1.8049170970916748,
+    "road_id": 775,
+    "lane_id": 5,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 156,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      392.6815490722656,
+      -187.59361267089844,
+      0.07325483113527298
+    ],
+    "velocity_xyz": [
+      1.505472368990013e-08,
+      -9.475557838367621e-11,
+      -1.2263227701187134
+    ],
+    "acceleration_xyz": [
+      4.511946372076636e-11,
+      -4.306487610961085e-09,
+      15.19278335571289
+    ],
+    "heading_deg": 90.59857940673828,
+    "speed_mps": 1.2263227701187134,
+    "road_id": 35,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 157,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      246.07313537597656,
+      -367.7494201660156,
+      0.07697030901908875
+    ],
+    "velocity_xyz": [
+      -2.457273353684286e-07,
+      2.2816454929852625e-06,
+      -1.3314522504806519
+    ],
+    "acceleration_xyz": [
+      -3.255280489611323e-07,
+      -7.146331881813239e-06,
+      5.439460277557373
+    ],
+    "heading_deg": -0.2953185439109802,
+    "speed_mps": 1.3314522504826294,
+    "road_id": 43,
+    "lane_id": -3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 158,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      356.21246337890625,
+      -168.62899780273438,
+      0.373619943857193
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 0.3261246383190155,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1264,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 159,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      9.065460205078125,
+      128.85195922851562,
+      0.1556837260723114
+    ],
+    "velocity_xyz": [
+      1.7529405340610538e-06,
+      -1.2466530918686658e-08,
+      -0.3114287555217743
+    ],
+    "acceleration_xyz": [
+      7.854137948015705e-05,
+      -4.705523224401986e-07,
+      4.7013702392578125
+    ],
+    "heading_deg": -90.28911590576172,
+    "speed_mps": 0.31142875552670796,
+    "road_id": 1072,
+    "lane_id": -2,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 160,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      8.01986026763916,
+      -106.67446899414062,
+      0.07173505425453186
+    ],
+    "velocity_xyz": [
+      -3.746151833183831e-09,
+      -4.38490310727957e-09,
+      -1.4777156114578247
+    ],
+    "acceleration_xyz": [
+      5.239576807980484e-07,
+      8.285712738143047e-07,
+      3.437638282775879
+    ],
+    "heading_deg": -90.224853515625,
+    "speed_mps": 1.4777156114578247,
+    "road_id": 48,
+    "lane_id": -2,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 161,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -503.6192932128906,
+      159.88677978515625,
+      0.062456339597702026
+    ],
+    "velocity_xyz": [
+      2.5158144012493722e-08,
+      2.3165775964173463e-09,
+      -1.5693094730377197
+    ],
+    "acceleration_xyz": [
+      2.515814458092791e-06,
+      2.3165776497080515e-07,
+      18.998645782470703
+    ],
+    "heading_deg": 90.35750579833984,
+    "speed_mps": 1.56930947303772,
+    "road_id": 41,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 162,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      4.508504867553711,
+      -109.56073760986328,
+      0.08745718002319336
+    ],
+    "velocity_xyz": [
+      1.4913254631210293e-08,
+      -8.958861030805565e-08,
+      -0.9596207141876221
+    ],
+    "acceleration_xyz": [
+      -1.7680769133221474e-06,
+      -8.680694008944556e-06,
+      12.233662605285645
+    ],
+    "heading_deg": -90.224853515625,
+    "speed_mps": 0.9596207141876264,
+    "road_id": 48,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 163,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      412.71893310546875,
+      -95.34849548339844,
+      0.0789874792098999
+    ],
+    "velocity_xyz": [
+      1.2837866734116687e-06,
+      -1.6910871591946375e-09,
+      -1.3542733192443848
+    ],
+    "acceleration_xyz": [
+      4.973173872713232e-06,
+      5.539363883144688e-06,
+      3.2213807106018066
+    ],
+    "heading_deg": -89.40142059326172,
+    "speed_mps": 1.3542733192449932,
+    "road_id": 36,
+    "lane_id": 6,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 164,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      209.0221405029297,
+      -371.247802734375,
+      0.2236199975013733
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 0.4299219250679016,
+    "speed_mps": 2.058000326156616,
+    "road_id": 267,
+    "lane_id": -2,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 165,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -15.57209300994873,
+      101.64974212646484,
+      0.057447031140327454
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -1.8695507049560547
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      9.044957160949707
+    ],
+    "heading_deg": 89.71089935302734,
+    "speed_mps": 1.8695507049560547,
+    "road_id": 1073,
+    "lane_id": 6,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 166,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -105.51869201660156,
+      16.305517196655273,
+      9.544929504394531
+    ],
+    "velocity_xyz": [
+      2.209434057931503e-08,
+      2.9620306207789326e-11,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      3.1395134669764957e-07,
+      4.2089232099584706e-10,
+      -9.800004959106445
+    ],
+    "heading_deg": -179.92318725585938,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1184,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 167,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -15.43787956237793,
+      128.2496337890625,
+      0.05891946703195572
+    ],
+    "velocity_xyz": [
+      -2.275496990478132e-05,
+      -0.004467576742172241,
+      -1.758622646331787
+    ],
+    "acceleration_xyz": [
+      -0.002275496954098344,
+      -0.4467576742172241,
+      17.531633377075195
+    ],
+    "heading_deg": 89.7109146118164,
+    "speed_mps": 1.7586283211499676,
+    "road_id": 1073,
+    "lane_id": 6,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 168,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -510.7397155761719,
+      179.14280700683594,
+      0.07898756116628647
+    ],
+    "velocity_xyz": [
+      -1.2883205045000068e-06,
+      8.811975149569662e-09,
+      -1.3542730808258057
+    ],
+    "acceleration_xyz": [
+      -1.0376811587775592e-05,
+      5.539053660186255e-08,
+      3.221404552459717
+    ],
+    "heading_deg": 90.35750579833984,
+    "speed_mps": 1.3542730808264185,
+    "road_id": 6,
+    "lane_id": -3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 169,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      262.7838134765625,
+      -118.74906158447266,
+      0.255562424659729
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 0.9272140264511108,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1044,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 170,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      314.1199645996094,
+      -127.8437271118164,
+      0.2555623948574066
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -89.48907470703125,
+    "speed_mps": 2.058000326156616,
+    "road_id": 653,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 171,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      133.1906280517578,
+      -169.8984375,
+      0.3736199140548706
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 0.3331906795501709,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1114,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 172,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      182.0563201904297,
+      -392.45147705078125,
+      0.07439466565847397
+    ],
+    "velocity_xyz": [
+      3.450165708684949e-09,
+      6.772501670582187e-09,
+      -1.3804090023040771
+    ],
+    "acceleration_xyz": [
+      9.406215895069181e-08,
+      8.231637593780761e-10,
+      5.579972267150879
+    ],
+    "heading_deg": -179.49859619140625,
+    "speed_mps": 1.3804090023040771,
+    "road_id": 42,
+    "lane_id": 5,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 173,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      401.83453369140625,
+      -50.27761459350586,
+      0.05710656940937042
+    ],
+    "velocity_xyz": [
+      -6.089663884267793e-08,
+      -4.667016773041155e-10,
+      -1.8932325839996338
+    ],
+    "acceleration_xyz": [
+      -6.089663656894118e-06,
+      -4.667016639814392e-08,
+      6.676769256591797
+    ],
+    "heading_deg": -89.5609130859375,
+    "speed_mps": 1.8932325839996347,
+    "road_id": 37,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 174,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      181.26939392089844,
+      -374.95623779296875,
+      0.057446956634521484
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -1.8695484399795532
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      9.045183181762695
+    ],
+    "heading_deg": 0.4299219250679016,
+    "speed_mps": 1.8695484399795532,
+    "road_id": 42,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 175,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      181.9950714111328,
+      -385.45172119140625,
+      0.05778360366821289
+    ],
+    "velocity_xyz": [
+      -1.5864546343280495e-09,
+      9.268466882872417e-09,
+      -1.8358838558197021
+    ],
+    "acceleration_xyz": [
+      -1.5864546298871574e-07,
+      9.268466669709596e-07,
+      12.411642074584961
+    ],
+    "heading_deg": -179.49859619140625,
+    "speed_mps": 1.8358838558197021,
+    "road_id": 42,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 176,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      14.734890937805176,
+      -179.3021240234375,
+      0.3736199140548706
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -90.224853515625,
+    "speed_mps": 2.058000326156616,
+    "road_id": 907,
+    "lane_id": 1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 177,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      402.2416076660156,
+      -97.5579833984375,
+      0.05556241795420647
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -89.40142059326172,
+    "speed_mps": 2.058000326156616,
+    "road_id": 36,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 178,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -15.687644004821777,
+      78.75006866455078,
+      0.05778348818421364
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -1.8358882665634155
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      12.411201477050781
+    ],
+    "heading_deg": 89.71089935302734,
+    "speed_mps": 1.8358882665634155,
+    "road_id": 1073,
+    "lane_id": 6,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 179,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -45.63199234008789,
+      340.2911376953125,
+      0.07174131274223328
+    ],
+    "velocity_xyz": [
+      -3.721623542674024e-08,
+      -2.6341536951690614e-08,
+      -1.4307235479354858
+    ],
+    "acceleration_xyz": [
+      -3.1139569500737707e-07,
+      -1.8851515903861582e-07,
+      5.716907978057861
+    ],
+    "heading_deg": 128.0540771484375,
+    "speed_mps": 1.4307235479354865,
+    "road_id": 45,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 180,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      8.278700828552246,
+      -40.720726013183594,
+      0.05898008123040199
+    ],
+    "velocity_xyz": [
+      5.907574234485791e-13,
+      1.505321700623341e-10,
+      -1.7288438081741333
+    ],
+    "acceleration_xyz": [
+      5.907574429642182e-11,
+      1.5053217339300318e-08,
+      21.854745864868164
+    ],
+    "heading_deg": -90.224853515625,
+    "speed_mps": 1.7288438081741333,
+    "road_id": 47,
+    "lane_id": -2,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 181,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      401.6971435546875,
+      -32.35908126831055,
+      0.07325490564107895
+    ],
+    "velocity_xyz": [
+      -5.269601288659942e-08,
+      5.649574696953152e-10,
+      -1.226324439048767
+    ],
+    "acceleration_xyz": [
+      -1.3140123655830394e-06,
+      1.8214722175002862e-08,
+      15.192758560180664
+    ],
+    "heading_deg": -89.5609130859375,
+    "speed_mps": 1.2263244390487682,
+    "road_id": 37,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 182,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      405.71929931640625,
+      -95.4216079711914,
+      0.15568360686302185
+    ],
+    "velocity_xyz": [
+      1.0327358950235066e-06,
+      2.230418294502101e-09,
+      -0.31142833828926086
+    ],
+    "acceleration_xyz": [
+      2.9040460503892973e-05,
+      2.7191967433282116e-07,
+      4.701364040374756
+    ],
+    "heading_deg": -89.40142059326172,
+    "speed_mps": 0.3114283382909732,
+    "road_id": 36,
+    "lane_id": 4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 183,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -81.9185562133789,
+      12.83720588684082,
+      9.776732444763184
+    ],
+    "velocity_xyz": [
+      3.155192018766684e-08,
+      4.2299407032597713e-11,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      4.483398470256361e-07,
+      6.01057037474817e-10,
+      -9.800004959106445
+    ],
+    "heading_deg": -179.92318725585938,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1184,
+    "lane_id": -2,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 184,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -514.1128540039062,
+      158.82125854492188,
+      0.05898004397749901
+    ],
+    "velocity_xyz": [
+      -2.980904151989039e-12,
+      4.777261919386433e-10,
+      -1.7288438081741333
+    ],
+    "acceleration_xyz": [
+      -2.980904134641804e-10,
+      4.777261963795354e-08,
+      21.854745864868164
+    ],
+    "heading_deg": 90.35750579833984,
+    "speed_mps": 1.7288438081741333,
+    "road_id": 41,
+    "lane_id": -4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 185,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      384.63922119140625,
+      -90.0726089477539,
+      0.07926908135414124
+    ],
+    "velocity_xyz": [
+      -5.360936139453543e-10,
+      8.253794447909968e-08,
+      -1.3495014905929565
+    ],
+    "acceleration_xyz": [
+      -7.155759540466988e-09,
+      1.0965998171741376e-06,
+      3.2221555709838867
+    ],
+    "heading_deg": 90.43909454345703,
+    "speed_mps": 1.349501490592959,
+    "road_id": 36,
+    "lane_id": -3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 186,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -12.065874099731445,
+      -241.77880859375,
+      0.06134031340479851
+    ],
+    "velocity_xyz": [
+      2.206629323708853e-10,
+      -2.3177917363170764e-09,
+      -1.6334298849105835
+    ],
+    "acceleration_xyz": [
+      2.206629368117774e-08,
+      -2.3177916830263712e-07,
+      17.33486557006836
+    ],
+    "heading_deg": 97.19615936279297,
+    "speed_mps": 1.6334298849105835,
+    "road_id": 1174,
+    "lane_id": 5,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 187,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      285.9111022949219,
+      -121.87586975097656,
+      0.3555624783039093
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -179.0779266357422,
+    "speed_mps": 2.058000326156616,
+    "road_id": 19,
+    "lane_id": 1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 188,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      181.2168731689453,
+      -367.9564514160156,
+      0.06245611235499382
+    ],
+    "velocity_xyz": [
+      5.143596659706873e-10,
+      2.5709100626158943e-08,
+      -1.5693082809448242
+    ],
+    "acceleration_xyz": [
+      5.143596837342557e-08,
+      2.570910055510467e-06,
+      18.998443603515625
+    ],
+    "heading_deg": 0.4299219250679016,
+    "speed_mps": 1.5693082809448244,
+    "road_id": 42,
+    "lane_id": -3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 189,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      66.74894714355469,
+      -170.27659606933594,
+      0.373619943857193
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 0.3261246383190155,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1217,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 190,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      68.35952758789062,
+      6.360339164733887,
+      11.230972290039062
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -179.76736450195312,
+    "speed_mps": 2.058000326156616,
+    "road_id": 1097,
+    "lane_id": 4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 191,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      310.9175109863281,
+      -161.22764587402344,
+      0.17361991107463837
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": 90.51093292236328,
+    "speed_mps": 2.058000326156616,
+    "road_id": 4,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 192,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      194.699951171875,
+      -311.1709899902344,
+      0.3736199736595154
+    ],
+    "velocity_xyz": [
+      0.0,
+      0.0,
+      -2.058000326156616
+    ],
+    "acceleration_xyz": [
+      0.0,
+      0.0,
+      -9.800004959106445
+    ],
+    "heading_deg": -179.8567352294922,
+    "speed_mps": 2.058000326156616,
+    "road_id": 231,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 193,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      412.3201599121094,
+      -48.39712905883789,
+      0.07132093608379364
+    ],
+    "velocity_xyz": [
+      2.799525766761235e-08,
+      -1.1835350477440443e-09,
+      -1.2735129594802856
+    ],
+    "acceleration_xyz": [
+      5.019984428145108e-10,
+      -6.552063069875658e-08,
+      15.718698501586914
+    ],
+    "heading_deg": -89.5609130859375,
+    "speed_mps": 1.273512959480286,
+    "road_id": 37,
+    "lane_id": 6,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 194,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      160.49594116210938,
+      -385.6398010253906,
+      0.07038091868162155
+    ],
+    "velocity_xyz": [
+      1.0607113836158533e-06,
+      1.0444853160151979e-07,
+      -1.3019659519195557
+    ],
+    "acceleration_xyz": [
+      -1.7880211089504883e-05,
+      -1.721690750855487e-05,
+      16.00140380859375
+    ],
+    "heading_deg": -179.49859619140625,
+    "speed_mps": 1.301965951919992,
+    "road_id": 42,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 195,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      -16.789888381958008,
+      -185.5473175048828,
+      0.15568368136882782
+    ],
+    "velocity_xyz": [
+      -1.6032986422942486e-06,
+      8.647353944013503e-09,
+      -0.31142863631248474
+    ],
+    "acceleration_xyz": [
+      -6.96706774760969e-05,
+      2.789730615404551e-07,
+      4.7013702392578125
+    ],
+    "heading_deg": 89.7751235961914,
+    "speed_mps": 0.3114286363166119,
+    "road_id": 49,
+    "lane_id": 6,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 196,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      248.691162109375,
+      -364.2301940917969,
+      0.058093201369047165
+    ],
+    "velocity_xyz": [
+      -3.968815727450892e-12,
+      -1.043586372873051e-08,
+      -1.8049176931381226
+    ],
+    "acceleration_xyz": [
+      -3.9688158315343003e-10,
+      -1.043586394189333e-06,
+      15.508258819580078
+    ],
+    "heading_deg": -0.2953185439109802,
+    "speed_mps": 1.8049176931381226,
+    "road_id": 43,
+    "lane_id": -4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 197,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      160.40272521972656,
+      -375.1402282714844,
+      0.07174123823642731
+    ],
+    "velocity_xyz": [
+      -1.3486569638843093e-09,
+      -1.1852900883013717e-09,
+      -1.4307234287261963
+    ],
+    "acceleration_xyz": [
+      6.378353401004233e-09,
+      -3.8135489432988834e-08,
+      5.716919898986816
+    ],
+    "heading_deg": 0.500910222530365,
+    "speed_mps": 1.4307234287261963,
+    "road_id": 50,
+    "lane_id": -1,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 198,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      248.58294677734375,
+      -385.22991943359375,
+      0.07992856949567795
+    ],
+    "velocity_xyz": [
+      4.264069097814627e-09,
+      7.325382256340163e-08,
+      -1.3383221626281738
+    ],
+    "acceleration_xyz": [
+      7.200033991239252e-08,
+      1.0733899671322433e-06,
+      3.2240748405456543
+    ],
+    "heading_deg": 179.70465087890625,
+    "speed_mps": 1.3383221626281758,
+    "road_id": 35,
+    "lane_id": 3,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 199,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      388.48150634765625,
+      -134.74452209472656,
+      0.07364477217197418
+    ],
+    "velocity_xyz": [
+      -2.599858589746873e-06,
+      3.9283422665903345e-05,
+      -1.3947221040725708
+    ],
+    "acceleration_xyz": [
+      1.2478949429350905e-05,
+      -0.00010406365618109703,
+      5.607163906097412
+    ],
+    "heading_deg": 90.43909454345703,
+    "speed_mps": 1.3947221046282179,
+    "road_id": 36,
+    "lane_id": -2,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  },
+  {
+    "vehicle_id": 200,
+    "frame": 121526,
+    "timestamp": 0.2,
+    "position_xyz": [
+      15.901372909545898,
+      96.3170394897461,
+      0.1556837260723114
+    ],
+    "velocity_xyz": [
+      1.7529405340610538e-06,
+      -1.2466530918686658e-08,
+      -0.3114287555217743
+    ],
+    "acceleration_xyz": [
+      7.854137948015705e-05,
+      -4.705523224401986e-07,
+      4.7013702392578125
+    ],
+    "heading_deg": -90.28911590576172,
+    "speed_mps": 0.31142875552670796,
+    "road_id": 1072,
+    "lane_id": -4,
+    "is_at_traffic_light": false,
+    "traffic_light_state": "None"
+  }
+]
