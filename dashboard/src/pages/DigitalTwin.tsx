@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/EmptyState";
 import { Badge } from "../components/Badge";
 import { PhysicalLayer } from "../components/PhysicalLayer";
-import { listScenes } from "../lib/api";
+import { DigitalTwin3D } from "../components/DigitalTwin3D";
+import type { RsuGeometry, CameraMode } from "../components/DigitalTwin3D";
+import { listScenes, listVehicles } from "../lib/api";
 import {
   useFrameSequencePlayback,
   type FrameTick,
@@ -158,9 +160,38 @@ export function DigitalTwin() {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [egoVehicleId, setEgoVehicleId] = useState<string>("181");
+  const [viewMode, setViewMode] = useState<"2d" | "3d">("2d");
+  const [cameraMode, setCameraMode] = useState<CameraMode>("topdown");
+  const [rsus, setRsus] = useState<RsuGeometry[]>([]);
 
   const scenes = scenesQuery.data ?? [];
   const activeSceneId = selectedSceneId ?? scenes[0]?.id ?? undefined;
+
+  // Real vehicle roster for this scene, used to resolve the ego
+  // dropdown's numeric CAM-### id (e.g. "181") into the actual database
+  // UUID the per-tick Frame data is keyed by -- vehicle_code was set as
+  // "Vehicle{numeric_id}" during ingestion (see ingest_real_scene.py),
+  // so this is a real, confirmed mapping, not a guess.
+  const vehiclesQuery = useQuery({
+    queryKey: ["vehicles", activeSceneId],
+    queryFn: () => listVehicles(activeSceneId as string),
+    enabled: !!activeSceneId,
+  });
+  const egoVehicleDbId = useMemo(() => {
+    const vehicles = vehiclesQuery.data ?? [];
+    const match = vehicles.find((v) => v.vehicle_code === `Vehicle${egoVehicleId}`);
+    return match?.id ?? null;
+  }, [vehiclesQuery.data, egoVehicleId]);
+
+  // Real RSU positions (from geometry_snapshot.json, extracted once via
+  // scripts/extract_rsus.py -- see that script's docstring). Fetched
+  // once; RSUs are static for the whole scene, they don't move per tick.
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}rsus.json`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: RsuGeometry[]) => setRsus(data))
+      .catch(() => setRsus([]));
+  }, []);
 
   const {
     isLoading,
@@ -248,6 +279,83 @@ export function DigitalTwin() {
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[480px_1fr]">
           <div className="rounded-lg border border-border bg-surface p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setViewMode("2d")}
+                aria-pressed={viewMode === "2d"}
+                className={`rounded-md border px-3 py-1 text-xs ${
+                  viewMode === "2d"
+                    ? "border-accent bg-accent text-white"
+                    : "border-border bg-surface-raised text-text-primary hover:bg-surface"
+                }`}
+              >
+                2D Map
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("3d")}
+                aria-pressed={viewMode === "3d"}
+                className={`rounded-md border px-3 py-1 text-xs ${
+                  viewMode === "3d"
+                    ? "border-accent bg-accent text-white"
+                    : "border-border bg-surface-raised text-text-primary hover:bg-surface"
+                }`}
+              >
+                Neon 3D
+              </button>
+              {viewMode === "3d" && (
+                <>
+                  <span className="mx-1 text-text-muted">|</span>
+                  <button
+                    type="button"
+                    onClick={() => setCameraMode("topdown")}
+                    aria-pressed={cameraMode === "topdown"}
+                    className={`rounded-md border px-3 py-1 text-xs ${
+                      cameraMode === "topdown"
+                        ? "border-accent bg-accent text-white"
+                        : "border-border bg-surface-raised text-text-primary hover:bg-surface"
+                    }`}
+                  >
+                    Top-Down
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCameraMode("driver")}
+                    aria-pressed={cameraMode === "driver"}
+                    className={`rounded-md border px-3 py-1 text-xs ${
+                      cameraMode === "driver"
+                        ? "border-accent bg-accent text-white"
+                        : "border-border bg-surface-raised text-text-primary hover:bg-surface"
+                    }`}
+                  >
+                    Driver's View
+                  </button>
+                </>
+              )}
+            </div>
+            {viewMode === "3d" ? (
+              <DigitalTwin3D
+                currentTick={currentTick}
+                previousTick={previousTick}
+                bounds={bounds}
+                selectedVehicleId={selectedVehicleId}
+                onSelectVehicle={setSelectedVehicleId}
+                rsus={rsus}
+                egoVehicleDbId={egoVehicleDbId}
+                cameraMode={cameraMode}
+              />
+            ) : null}
+            {viewMode === "3d" && (
+              <p className="mt-2 text-xs text-text-muted">
+                Real (data-driven): vehicle positions, headings, movement, RSUs,
+                traffic-light state, V2V proximity. Decorative (visual approximation,
+                not measured): trees, buildings, terrain — generic scene dressing, not
+                claimed as recorded CARLA geometry. Real Town04 environment geometry
+                planned for Stage 2, after the remaining Phase 2 scenes are generated.
+              </p>
+            )}
+            {viewMode === "2d" && (
             <svg
               width={SVG_SIZE}
               height={SVG_SIZE}
@@ -325,7 +433,9 @@ export function DigitalTwin() {
                 );
               })}
             </svg>
+            )}
 
+            {viewMode === "2d" && (
             <div className="mt-2 flex items-center gap-4 text-xs text-text-secondary">
               <span className="flex items-center gap-1">
                 <span className="inline-block h-2 w-2 rounded-full" style={{ background: "var(--color-accent)" }} />
@@ -344,6 +454,7 @@ export function DigitalTwin() {
                 At green light
               </span>
             </div>
+            )}
 
             {/* Playback controls */}
             <div className="mt-4 flex flex-wrap items-center gap-2">
