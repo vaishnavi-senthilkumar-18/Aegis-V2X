@@ -14,17 +14,6 @@ import {
 } from "../hooks/useFrameSequencePlayback";
 import type { Frame } from "../types/api";
 
-/**
- * Real scenes span a much larger area than the synthetic generator's
- * fixed 60m half-extent (this scene alone is ~928m x ~776m -- see
- * `docs/phase2_phase3_reconciliation_2026-09-10.md`'s ingestion notes).
- * Bounds are therefore computed from the actual loaded sequence, not a
- * hardcoded constant, so real scenes of any size render correctly
- * without clipping or a mis-scaled view.
- */
-const SVG_SIZE = 480;
-const SVG_PADDING = 24;
-
 interface Bounds {
   minX: number;
   maxX: number;
@@ -32,11 +21,19 @@ interface Bounds {
   maxY: number;
 }
 
+/**
+ * Real scenes span a much larger area than the synthetic generator's
+ * fixed 60m half-extent (this scene alone is ~928m x~776m -- see
+ * `docs/phase2_phase3_reconciliation_2026-09-10.md`'s ingestion notes).
+ * Bounds are therefore computed from the actual loaded sequence, not a
+ * hardcoded constant, so real scenes of any size render correctly in
+ * the 3D view without clipping or a mis-scaled camera.
+ */
 function computeBounds(ticks: FrameTick[]): Bounds | null {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   let found = false;
   for (const tick of ticks) {
-    for (const frame of Object.values(tick.vehicles)) {
+    for (const frame of Object.values(tick.vehicles)){
       if (frame.position_x == null || frame.position_y == null) continue;
       found = true;
       minX = Math.min(minX, frame.position_x);
@@ -46,44 +43,6 @@ function computeBounds(ticks: FrameTick[]): Bounds | null {
     }
   }
   return found ? { minX, maxX, minY, maxY } : null;
-}
-
-function worldToSvg(x: number, y: number, bounds: Bounds): { cx: number; cy: number } {
-  const usable = SVG_SIZE - SVG_PADDING * 2;
-  const spanX = bounds.maxX - bounds.minX || 1;
-  const spanY = bounds.maxY - bounds.minY || 1;
-  const cx = SVG_PADDING + ((x - bounds.minX) / spanX) * usable;
-  // Flip Y so it reads naturally on screen (CARLA's Y grows opposite to screen-down SVG Y).
-  const cy = SVG_PADDING + (1 - (y - bounds.minY) / spanY) * usable;
-  return { cx, cy };
-}
-
-/** Real heading derived from the actual position delta between two
- * consecutive real frames -- there is no `heading` field on `Frame`
- * (vehicle_states.json's heading_deg was never mapped into the schema),
- * so this is computed, not fabricated. Returns null (no rotation) when
- * there's no prior frame or the vehicle hasn't moved. */
-function headingFromDelta(prev: Frame | undefined, curr: Frame): number | null {
-  if (!prev || prev.position_x == null || prev.position_y == null) return null;
-  if (curr.position_x == null || curr.position_y == null) return null;
-  const dx = curr.position_x - prev.position_x;
-  const dy = curr.position_y - prev.position_y;
-  if (Math.abs(dx) < 1e-4 && Math.abs(dy) < 1e-4) return null;
-  return (Math.atan2(-dy, dx) * 180) / Math.PI;
-}
-
-/**
- * Real direction-of-travel color, derived from `lane_id`'s sign.
- * CARLA/OpenDRIVE convention: negative and positive lane_id values on
- * the same road represent opposite driving directions (confirmed by
- * inspecting this scene's real data directly -- distinct negative
- * values -4..-1 and positive values 1..6 both appear across the
- * scene). This is a genuine structural fact from the data, not a
- * decorative color choice.
- */
-function directionColor(laneId: number | null): string {
-  if (laneId == null) return "var(--color-text-muted)";
-  return laneId < 0 ? "#f97316" /* orange: negative-lane direction */ : "var(--color-accent)" /* blue: positive-lane direction */;
 }
 
 /**
@@ -103,56 +62,17 @@ function trafficLightState(frame: Frame): { atLight: boolean; state: string | nu
   };
 }
 
-function trafficLightColor(state: string | null): string {
-  if (state === "Red") return "#ef4444";
-  if (state === "Green") return "#22c55e";
-  if (state === "Yellow") return "#eab308";
-  return "var(--color-text-muted)";
-}
-
 const SPEED_OPTIONS: PlaybackSpeed[] = [0.5, 1, 2];
 
 /**
- * Real vehicle ID range for this scene, confirmed directly from
- * convert_all_ego_candidates.py's output (54 distinct vehicles,
- * contiguous 147-200) -- not assumed. If a different scene has a
- * different range, this constant needs updating to match; there is no
- * live vehicle-list endpoint wired in here yet.
+ * Extracts the numeric vehicle ID from a vehicle_code like "Vehicle181"
+ * or "Vehicle6724" -- works for any scene's numbering, not just the
+ * straight-road scene's 147-200 range.
  */
-const EGO_VEHICLE_ID_OPTIONS = Array.from({ length: 54 }, (_, i) => String(147 + i));
-
-/**
- * V2V-style connection lines: drawn between any two vehicles within a
- * real proximity threshold at the CURRENT tick only, using their actual
- * position_x/position_y. This is a visual proxy for "vehicles close
- * enough to plausibly be in V2V range" -- it is derived from genuine
- * distance, not a decorative/random effect, but it is NOT the same as
- * a real V2V link (that would need actual CSI/SNR data, which does not
- * exist yet for source="carla_only" frames -- see carla_ingestion.py).
- * Do not present these lines as confirmed communication links in any
- * screenshot/report without that caveat.
- */
-const V2V_PROXIMITY_THRESHOLD_M = 90;
-
-function computeProximityPairs(
-  vehicles: Frame[],
-): Array<[Frame, Frame]> {
-  const pairs: Array<[Frame, Frame]> = [];
-  for (let i = 0; i < vehicles.length; i++) {
-    const a = vehicles[i];
-    if (a.position_x == null || a.position_y == null) continue;
-    for (let j = i + 1; j < vehicles.length; j++) {
-      const b = vehicles[j];
-      if (b.position_x == null || b.position_y == null) continue;
-      const dx = a.position_x - b.position_x;
-      const dy = a.position_y - b.position_y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist <= V2V_PROXIMITY_THRESHOLD_M) {
-        pairs.push([a, b]);
-      }
-    }
-  }
-  return pairs;
+function numericIdFromVehicleCode(code: string | null | undefined): string | null {
+  if (!code) return null;
+  const match = code.match(/(\d+)$/);
+  return match ? match[1] : null;
 }
 
 export function DigitalTwin() {
@@ -160,7 +80,6 @@ export function DigitalTwin() {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [egoVehicleId, setEgoVehicleId] = useState<string>("181");
-  const [viewMode, setViewMode] = useState<"2d" | "3d">("2d");
   const [cameraMode, setCameraMode] = useState<CameraMode>("topdown");
   const [rsus, setRsus] = useState<RsuGeometry[]>([]);
 
@@ -179,11 +98,37 @@ export function DigitalTwin() {
   });
   const egoVehicleDbId = useMemo(() => {
     const vehicles = vehiclesQuery.data ?? [];
-    const match = vehicles.find((v) => v.vehicle_code === `Vehicle${egoVehicleId}`);
+    const match = vehicles.find((v) => numericIdFromVehicleCode(v.vehicle_code) === egoVehicleId);
     return match?.id ?? null;
   }, [vehiclesQuery.data, egoVehicleId]);
 
-  // Real RSU positions (from geometry_snapshot.json, extracted once via
+  // Real per-scene vehicle ID list, derived from the actual roster
+  // returned for the currently selected scene -- NOT a hardcoded range.
+  // The straight-road scene has vehicles 147-200; the roundabout scene
+  // has 6718-6756; a hardcoded list broke ego vehicle resolution (and
+  // therefore Physical Layer's camera lookup) on any scene other than
+  // the one the constant happened to match.
+  const egoVehicleIdOptions = useMemo(() => {
+    const vehicles = vehiclesQuery.data ?? [];
+    const ids = vehicles
+      .map((v) => numericIdFromVehicleCode(v.vehicle_code))
+      .filter((id): id is string => id != null);
+    return Array.from(new Set(ids)).sort((a, b) => Number(a) - Number(b));
+  }, [vehiclesQuery.data]);
+
+  // If the current ego vehicle isn't valid for the newly selected scene
+  // (e.g. it was "181" and the scene just changed to the roundabout,
+  // which has no vehicle 181), snap to the first real vehicle in the
+  // new scene's roster instead of silently keeping a stale, nonexistent
+  // ego vehicle id.
+  useEffect(() => {
+    if (egoVehicleIdOptions.length === 0) return;
+    if (!egoVehicleIdOptions.includes(egoVehicleId)) {
+      setEgoVehicleId(egoVehicleIdOptions[0]);
+    }
+  }, [egoVehicleIdOptions, egoVehicleId]);
+
+  // Real RSU positions (from geometry_snapshot.json,extracted once via
   // scripts/extract_rsus.py -- see that script's docstring). Fetched
   // once; RSUs are static for the whole scene, they don't move per tick.
   useEffect(() => {
@@ -219,16 +164,12 @@ export function DigitalTwin() {
     [currentTick, selectedVehicleId],
   );
 
-  const allFrameIndices = useMemo(
-    () => sequence.ticks.map((t) => t.frameIndex),
-    [sequence.ticks],
-  );
 
   return (
     <div>
       <PageHeader
         title="Digital Twin"
-        subtitle="Real recorded CARLA scene â€” play, pause, and scrub through actual simulation frames"
+        subtitle="Real recorded CARLA scene ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ play, pause, and scrub through actual simulation frames"
         actions={
           scenes.length > 0 ? (
             <select
@@ -268,194 +209,66 @@ export function DigitalTwin() {
         />
       ) : (
         <>
-          <div className="mb-6">
+        {/*
+          Two-column 50/50 layout (Physical Layer | Digital Twin) is now
+          isolated in its own grid, separate from Vehicle Inspector below.
+          Previously Vehicle Inspector was a third child of this same
+          grid-cols-2 container, which caused it to auto-wrap into column 1
+          of a second row, leaving an empty gap in column 2 next to it.
+        */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 w-full">
+          <div className="min-w-0 w-full h-full overflow-hidden flex flex-col">
             <PhysicalLayer
               frameIndex={currentTick.frameIndex}
               egoVehicleId={egoVehicleId}
-              availableVehicleIds={EGO_VEHICLE_ID_OPTIONS}
-              allFrameIndices={allFrameIndices}
+              availableVehicleIds={egoVehicleIdOptions}
               onChangeEgoVehicle={setEgoVehicleId}
             />
           </div>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[480px_1fr]">
-          <div className="rounded-lg border border-border bg-surface p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setViewMode("2d")}
-                aria-pressed={viewMode === "2d"}
-                className={`rounded-md border px-3 py-1 text-xs ${
-                  viewMode === "2d"
-                    ? "border-accent bg-accent text-white"
-                    : "border-border bg-surface-raised text-text-primary hover:bg-surface"
-                }`}
-              >
-                2D Map
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("3d")}
-                aria-pressed={viewMode === "3d"}
-                className={`rounded-md border px-3 py-1 text-xs ${
-                  viewMode === "3d"
-                    ? "border-accent bg-accent text-white"
-                    : "border-border bg-surface-raised text-text-primary hover:bg-surface"
-                }`}
-              >
-                Neon 3D
-              </button>
-              {viewMode === "3d" && (
-                <>
-                  <span className="mx-1 text-text-muted">|</span>
-                  <button
-                    type="button"
-                    onClick={() => setCameraMode("topdown")}
-                    aria-pressed={cameraMode === "topdown"}
-                    className={`rounded-md border px-3 py-1 text-xs ${
-                      cameraMode === "topdown"
-                        ? "border-accent bg-accent text-white"
-                        : "border-border bg-surface-raised text-text-primary hover:bg-surface"
-                    }`}
-                  >
-                    Top-Down
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCameraMode("driver")}
-                    aria-pressed={cameraMode === "driver"}
-                    className={`rounded-md border px-3 py-1 text-xs ${
-                      cameraMode === "driver"
-                        ? "border-accent bg-accent text-white"
-                        : "border-border bg-surface-raised text-text-primary hover:bg-surface"
-                    }`}
-                  >
-                    Driver's View
-                  </button>
-                </>
-              )}
+          <div className="min-w-0 w-full h-full rounded-lg border border-border bg-surface p-4 flex flex-col">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold tracking-wide text-text-primary">
+                DIGITAL TWIN LAYER
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCameraMode("topdown")}
+                  aria-pressed={cameraMode === "topdown"}
+                  className={`rounded-md border px-3 py-1 text-xs ${
+                    cameraMode === "topdown"
+                      ? "border-accent bg-accent text-white"
+                      : "border-border bg-surface-raised text-text-primary hover:bg-surface"
+                  }`}
+                >
+                  TOP-DOWN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCameraMode("driver")}
+                  aria-pressed={cameraMode === "driver"}
+                  className={`rounded-md border px-3 py-1 text-xs ${
+                    cameraMode === "driver"
+                      ? "border-accent bg-accent text-white"
+                      : "border-border bg-surface-raised text-text-primary hover:bg-surface"
+                  }`}
+                >
+                  DRIVER'S VIEW
+                </button>
+              </div>
             </div>
-            {viewMode === "3d" ? (
-              <DigitalTwin3D
-                currentTick={currentTick}
-                previousTick={previousTick}
-                bounds={bounds}
-                selectedVehicleId={selectedVehicleId}
-                onSelectVehicle={setSelectedVehicleId}
-                rsus={rsus}
-                egoVehicleDbId={egoVehicleDbId}
-                cameraMode={cameraMode}
-              />
-            ) : null}
-            {viewMode === "3d" && (
-              <p className="mt-2 text-xs text-text-muted">
-                Real (data-driven): vehicle positions, headings, movement, RSUs,
-                traffic-light state, V2V proximity. Decorative (visual approximation,
-                not measured): trees, buildings, terrain — generic scene dressing, not
-                claimed as recorded CARLA geometry. Real Town04 environment geometry
-                planned for Stage 2, after the remaining Phase 2 scenes are generated.
-              </p>
-            )}
-            {viewMode === "2d" && (
-            <svg
-              width={SVG_SIZE}
-              height={SVG_SIZE}
-              viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
-              className="w-full"
-              role="img"
-              aria-label="Digital Twin playback of real recorded scene"
-            >
-              <rect
-                x={0}
-                y={0}
-                width={SVG_SIZE}
-                height={SVG_SIZE}
-                fill="var(--color-surface-raised)"
-                opacity={0.3}
-              />
-
-              {/* Real proximity-based V2V-style connection lines -- see
-                  computeProximityPairs's own comment on what these
-                  genuinely represent vs. a real communication link. */}
-              {computeProximityPairs(Object.values(currentTick.vehicles)).map(
-                ([a, b], idx) => {
-                  const pa = worldToSvg(a.position_x as number, a.position_y as number, bounds);
-                  const pb = worldToSvg(b.position_x as number, b.position_y as number, bounds);
-                  return (
-                    <line
-                      key={`${a.vehicle_id}-${b.vehicle_id}-${idx}`}
-                      x1={pa.cx}
-                      y1={pa.cy}
-                      x2={pb.cx}
-                      y2={pb.cy}
-                      className="twin-connection-line"
-                      strokeWidth={1}
-                    />
-                  );
-                },
-              )}
-
-              {Object.values(currentTick.vehicles).map((frame) => {
-                if (frame.position_x == null || frame.position_y == null) return null;
-                const { cx, cy } = worldToSvg(frame.position_x, frame.position_y, bounds);
-                const prevFrame = previousTick?.vehicles[frame.vehicle_id];
-                const heading = headingFromDelta(prevFrame, frame);
-                const isSelected = frame.vehicle_id === selectedVehicleId;
-                const color = directionColor(frame.lane_id);
-                const { atLight, state } = trafficLightState(frame);
-
-                return (
-                  <g
-                    key={frame.vehicle_id}
-                    transform={`translate(${cx}, ${cy})${heading != null ? ` rotate(${heading})` : ""}`}
-                    onClick={() => setSelectedVehicleId(frame.vehicle_id)}
-                    className={`cursor-pointer twin-glow-vehicle${isSelected ? " twin-glow-vehicle--selected" : ""}`}
-                  >
-                    <circle
-                      r={isSelected ? 9 : 6}
-                      fill={color}
-                      stroke={isSelected ? "var(--color-text-primary)" : "none"}
-                      strokeWidth={2}
-                    />
-                    {heading != null && (
-                      <path
-                        d="M 6 0 L 12 -3 L 12 3 Z"
-                        fill={color}
-                      />
-                    )}
-                    {/* Real traffic-light marker: a small dot above the
-                        vehicle, colored by that vehicle's actual real
-                        traffic_light_state -- only rendered when the
-                        vehicle is genuinely at a light (is_at_traffic_light). */}
-                    {atLight && (
-                      <circle cx={0} cy={-14} r={3} fill={trafficLightColor(state)} />
-                    )}
-                  </g>
-                );
-              })}
-            </svg>
-            )}
-
-            {viewMode === "2d" && (
-            <div className="mt-2 flex items-center gap-4 text-xs text-text-secondary">
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-full" style={{ background: "var(--color-accent)" }} />
-                Lane +
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#f97316" }} />
-                Lane − (opposite direction)
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#ef4444" }} />
-                At red light
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#22c55e" }} />
-                At green light
-              </span>
+            <div className="w-full" style={{ aspectRatio: "16 / 9" }}>
+            <DigitalTwin3D
+              currentTick={currentTick}
+              previousTick={previousTick}
+              bounds={bounds}
+              selectedVehicleId={selectedVehicleId}
+              onSelectVehicle={setSelectedVehicleId}
+              rsus={rsus}
+              egoVehicleDbId={egoVehicleDbId}
+              cameraMode={cameraMode}
+            />
             </div>
-            )}
-
             {/* Playback controls */}
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <button
@@ -497,11 +310,13 @@ export function DigitalTwin() {
               className="mt-3 w-full"
             />
             <div className="mt-1 text-xs text-text-secondary mono">
-              Frame {currentTick.frameIndex} Â· tick {currentTickIndex + 1}/{sequence.ticks.length}
+              Frame {currentTick.frameIndex} Ãƒâ€šÃ‚Â· tick {currentTickIndex + 1}/{sequence.ticks.length}
             </div>
           </div>
+        </div>
 
-          <div className="rounded-lg border border-border bg-surface p-5">
+        {/* Vehicle Inspector: full-width row below the 50/50 pair, not part of that grid */}
+        <div className="mt-4 w-full rounded-lg border border-border bg-surface p-5">
             <h2 className="text-sm font-medium text-text-primary">Vehicle Inspector</h2>
             {!selectedFrame ? (
               <div className="mt-4">
@@ -549,7 +364,7 @@ export function DigitalTwin() {
                 <dd>
                   {selectedFrame.source === "carla_only" ? (
                     <Badge color="var(--color-text-secondary)">
-                      carla_only Â· no wireless data yet
+                      carla_only Ãƒâ€šÃ‚Â· no wireless data yet
                     </Badge>
                   ) : (
                     <Badge
@@ -570,7 +385,6 @@ export function DigitalTwin() {
                 </dd>
               </dl>
             )}
-          </div>
         </div>
         </>
       )}

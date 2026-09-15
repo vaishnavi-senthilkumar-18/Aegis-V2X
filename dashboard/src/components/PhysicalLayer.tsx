@@ -1,70 +1,170 @@
-/**
- * Renders the real CARLA onboard-camera feed for a user-selected "ego"
- * vehicle, synchronized to the same frame_index the Digital Twin
- * playback is currently showing. The person can switch which vehicle's
- * camera is shown via a dropdown, live, with no code changes -- every
- * vehicle in the scene was pre-converted to PNGs (see
- * convert_all_ego_candidates.py), organized as
- * public/camera_frames/<vehicle_id>/frame_<index>.png.
+﻿/**
+ * Renders the real CARLA onboard-camera feed for the selected ego vehicle.
+ * Playback follows the same DB frame/tick timeline as the Digital Twin.
  *
- * Design-integrity note: this is real CARLA-rendered simulation output
- * (a forward-facing onboard camera), NOT a real photograph. Labeled
- * "Simulated Roadview" rather than "Live Roadview" for that reason.
- *
- * Preloading: at 10Hz playback, swapping <img src> on every tick without
- * preloading causes a visible flash/flicker each time the browser has to
- * fetch a not-yet-cached image. To avoid this, every frame for the
- * CURRENTLY SELECTED ego vehicle is preloaded into the browser's image
- * cache (via `new Image()`) whenever the vehicle or frame list changes,
- * BEFORE playback needs them. This does not fabricate anything -- it
- * only pre-fetches real files that already exist, so they're ready
- * instantly when their real tick comes up during playback.
+ * If the exact DB frame is not available for the selected vehicle camera,
+ * the nearest recorded real camera frame is displayed.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Props {
   frameIndex: number | null;
   egoVehicleId: string;
   availableVehicleIds: string[];
-  allFrameIndices: number[];
   onChangeEgoVehicle: (vehicleId: string) => void;
+}
+
+type CameraFrameManifest = Record<string, number[]>;
+
+function findNearestFrame(
+  requestedFrame: number,
+  availableFrames: number[]
+): number | null {
+  if (availableFrames.length === 0) return null;
+
+  if (availableFrames.includes(requestedFrame)) {
+    return requestedFrame;
+  }
+
+  let left = 0;
+  let right = availableFrames.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const value = availableFrames[mid];
+
+    if (value === requestedFrame) {
+      return value;
+    }
+
+    if (value < requestedFrame) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  const lower = right >= 0 ? availableFrames[right] : null;
+  const upper = left < availableFrames.length ? availableFrames[left] : null;
+
+  if (lower == null) return upper;
+  if (upper == null) return lower;
+
+  return requestedFrame - lower <= upper - requestedFrame
+    ? lower
+    : upper;
 }
 
 export function PhysicalLayer({
   frameIndex,
   egoVehicleId,
   availableVehicleIds,
-  allFrameIndices,
   onChangeEgoVehicle,
 }: Props) {
   const preloadedRef = useRef<Set<string>>(new Set());
+  const [manifest, setManifest] = useState<CameraFrameManifest | null>(null);
 
   const frameUrl = (vehicleId: string, idx: number) =>
     `${import.meta.env.BASE_URL}camera_frames/${vehicleId}/frame_${idx}.png`;
 
-  // Preload every real frame for the current ego vehicle whenever it
-  // (or the available frame list) changes, so scrubbing/playing through
-  // them later hits the browser cache instantly instead of flashing on
-  // each fetch.
+  // Load the tiny camera availability manifest once.
   useEffect(() => {
-    for (const idx of allFrameIndices) {
+    let cancelled = false;
+
+    fetch(`${import.meta.env.BASE_URL}camera_frames_manifest.json`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Manifest request failed: ${response.status}`);
+        }
+        return response.json() as Promise<CameraFrameManifest>;
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setManifest(data);
+        }
+      })
+      .catch((error) => {
+        console.warn("Camera frame manifest unavailable:", error);
+        if (!cancelled) {
+          setManifest({});
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const availableCameraFrames = useMemo(() => {
+    return manifest?.[egoVehicleId] ?? [];
+  }, [manifest, egoVehicleId]);
+
+  const resolvedCameraFrame = useMemo(() => {
+    if (frameIndex == null) return null;
+
+    // While the manifest is loading, don't guess.
+    if (manifest === null) return null;
+
+    // If this vehicle has a manifest, use the nearest REAL camera frame.
+    if (availableCameraFrames.length > 0) {
+      return findNearestFrame(frameIndex, availableCameraFrames);
+    }
+
+    // Fallback: attempt the exact DB frame if no manifest entry exists.
+    return frameIndex;
+  }, [frameIndex, manifest, availableCameraFrames]);
+
+  // Preload only a small window around the RESOLVED camera frame.
+  // Never preload the entire 4+ GB camera dataset.
+  useEffect(() => {
+    if (
+      resolvedCameraFrame == null ||
+      availableCameraFrames.length === 0
+    ) {
+      return;
+    }
+
+    const currentPosition = availableCameraFrames.indexOf(
+      resolvedCameraFrame
+    );
+
+    const start = Math.max(0, currentPosition - 2);
+    const end = Math.min(
+      availableCameraFrames.length,
+      currentPosition + 8
+    );
+
+    for (let i = start; i < end; i++) {
+      const idx = availableCameraFrames[i];
       const url = frameUrl(egoVehicleId, idx);
+
       if (preloadedRef.current.has(url)) continue;
+
       const img = new window.Image();
       img.src = url;
       preloadedRef.current.add(url);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [egoVehicleId, allFrameIndices]);
+  }, [egoVehicleId, resolvedCameraFrame, availableCameraFrames]);
 
-  const imageSrc = frameIndex != null ? frameUrl(egoVehicleId, frameIndex) : null;
+  const imageSrc =
+    resolvedCameraFrame != null
+      ? frameUrl(egoVehicleId, resolvedCameraFrame)
+      : null;
+
+  const isExactFrame =
+    frameIndex != null &&
+    resolvedCameraFrame != null &&
+    frameIndex === resolvedCameraFrame;
 
   return (
     <div className="physical-layer">
       <div className="physical-layer__header">
         <span className="physical-layer__title">PHYSICAL LAYER</span>
-        <span className="physical-layer__subtitle">SIMULATED ROADVIEW</span>
+        <span className="physical-layer__subtitle">
+          SIMULATED ROADVIEW
+        </span>
+
         <select
           value={egoVehicleId}
           onChange={(e) => onChangeEgoVehicle(e.target.value)}
@@ -81,22 +181,37 @@ export function PhysicalLayer({
       <div className="physical-layer__viewport">
         {imageSrc ? (
           <img
+            key={`${egoVehicleId}-${resolvedCameraFrame}`}
             src={imageSrc}
-            alt={`Onboard camera, vehicle ${egoVehicleId}, frame ${frameIndex}`}
+            alt={`Onboard camera, vehicle ${egoVehicleId}, camera frame ${resolvedCameraFrame}`}
             className="physical-layer__image"
             onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
+              const img = e.currentTarget;
+              img.style.display = "";
+              img.alt = `Camera frame unavailable: vehicle ${egoVehicleId}, camera frame ${resolvedCameraFrame}`;
             }}
           />
         ) : (
-          <div className="physical-layer__empty">No camera frame for this tick</div>
+          <div className="physical-layer__empty">
+            {frameIndex != null
+              ? "Loading camera frame..."
+              : "No camera frame for this tick"}
+          </div>
         )}
       </div>
 
       <div className="physical-layer__footer">
         <span>Vehicle {egoVehicleId}</span>
-        <span>{frameIndex != null ? `Frame ${frameIndex}` : "No frame"}</span>
+
+        <span>
+          {frameIndex != null && resolvedCameraFrame != null
+            ? isExactFrame
+              ? `Frame ${frameIndex}`
+              : `DB ${frameIndex} • Camera ${resolvedCameraFrame}`
+            : "No frame"}
+        </span>
       </div>
     </div>
   );
 }
+

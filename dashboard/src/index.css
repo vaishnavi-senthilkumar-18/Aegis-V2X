@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @theme {
   --color-bg: #0a0e14;
@@ -121,6 +121,8 @@ body {
 
 /* --- Physical Layer camera feed panel --- */
 .physical-layer {
+  width: 100%;
+  max-width: none;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   background: var(--color-surface);
@@ -196,3 +198,22 @@ body {
   font-family: var(--font-mono);
   font-size: 0.75rem;
 }
+
+
+
+.digital-twin-3d__viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.digital-twin-3d__viewport canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+

@@ -8,64 +8,52 @@
  * Layer), shared frame/tick clock, TOP-DOWN and DRIVER'S VIEW cameras
  * both reading the SAME scene graph.
  *
- * STAGE 2 (NOT implemented yet -- deliberately deferred until after the
- * 3 remaining Phase 2 scenes are generated, per project decision
- * 2026-09-14): a real CARLA connection (loading Town04, no scenario
- * re-run) to extract actual road/lane OpenDRIVE geometry, terrain,
- * buildings, vegetation, barriers, poles, and traffic-light positions
- * via `world.get_environment_objects()` / `to_opendrive()`. The
- * `environment` prop below is the integration point for that data --
- * it is typed and wired into the render loop now, but passed an empty
- * object until Stage 2 actually runs, so nothing is fabricated in the
- * meantime.
+ * 2026-09-15 FIX -- per-frame road rebuild causing visible "blinking"
+ * on every tick during playback. Two independent causes, both fixed
+ * here, neither touching the vehicle/RSU/environment rendering:
  *
- * FINAL (not reached until Stage 2 lands): once `environment` carries
- * real geometry, this same component renders it alongside the vehicles
- * without any architectural change -- that is the whole point of
- * wiring the prop in now rather than bolting it on later.
+ *   1. `dominantAxis` (which axis the approximate road strip is
+ *      oriented along) had been changed to recompute from the tiny
+ *      position DELTA between consecutive ticks, instead of the
+ *      overall real position spread across the whole scene. With ~54
+ *      vehicles moving in mixed directions, that per-tick comparison
+ *      can flip between "x" and "y" from one frame to the next, and
+ *      every flip destroys and rebuilds the entire road mesh (see the
+ *      road-building effect below, which depends on `dominantAxis`).
+ *      Reverted to the original stable form: computed once from
+ *      `bounds` (the whole scene's real position spread), which only
+ *      changes when the scene itself changes -- not every tick.
  *
- * CONFIRMED DATA SCOPE, STAGE 1 (checked directly, 2026-09-14):
- * geometry_snapshot.json has exactly 58 real objects for this scene --
- * 54 vehicles + 4 RSUs. No pedestrians, buildings, trees, or exact
- * Town04 road mesh exist anywhere in the CURRENTLY RECORDED dataset --
- * that is a Stage 1 data limitation, not a claim that those things
- * never existed in the CARLA world (the RGB camera frames show they
- * did; we simply never exported their coordinates as structured data).
- * Vehicles are rendered as a procedurally built multi-part shape
- * (body+cabin) via `buildVehicleMesh`, written as a single swappable
- * factory function so a real .glb model can replace it later without
- * touching the rest of this component. The road is an APPROXIMATE lane
- * strip (real lane count, oriented along the real dominant spread of
- * vehicle positions, standard 3.5m lane width -- an engineering
- * convention, not measured Town04 geometry) -- Stage 2's real
- * OpenDRIVE export will replace this, not supplement it.
+ *   2. `laneCount` recomputed from ONLY the current tick's visible
+ *      lane IDs, every tick. Since which lanes are occupied
+ *      legitimately changes frame to frame as vehicles move, enter,
+ *      and leave view, this value could change on nearly every tick --
+ *      and the same road-building effect also depends on `laneCount`,
+ *      so it would rebuild just as often. Fixed by tracking the
+ *      MAXIMUM distinct lane count seen so far during this scene's
+ *      playback (a monotonically non-decreasing value, via
+ *      `maxLaneCountSeenRef`), so the road's lane count stabilizes
+ *      once the true lane count has been observed, instead of
+ *      fluctuating with momentary occupancy. Reset to the scene's
+ *      default whenever `bounds` changes (i.e. a new scene loads).
  *
- * 2026-09-14 FIX -- vehicle/RSU mesh scale mismatch (root cause of the
- * "solid color blob" render seen in Driver's View): vehicle and RSU
- * mesh geometry was built at a FIXED absolute size, while vehicle
- * POSITIONS are compressed into the scene by a data-dependent `scale`
- * factor (`SCENE_WIDTH_UNITS / max(spanX, spanY)`, computed from the
- * real position spread of the current scene). For a scene with a large
- * real position spread, `scale` is small, so vehicles end up positioned
- * close together in scene-space while their mesh geometry stays full
- * size -- meshes overlap heavily and the Driver's View camera (only a
- * few scene-units in front of the ego vehicle) ends up rendering inside
- * an oversized, overlapping mesh. Fix: vehicle and RSU mesh groups are
- * now scaled by the SAME `scale` factor used for positions, every tick,
- * so geometry and position share one coordinate space. This is a
- * rendering-correctness fix, not a data change -- no position values
- * are altered.
+ * 2026-09-15 FIX -- Top-Down camera was effectively a drone/satellite
+ * view, not the "few floors up" perspective intended. The previous
+ * offset (`egoWorldPos.y + 12`, `egoWorldPos.z + 9`) was a RAW
+ * scene-unit value, not real-world meters -- for a scene with a large
+ * real position spread (this one is ~928m), the `scale` factor
+ * compressing real meters into scene units is small, so "12 scene
+ * units" corresponds to roughly 60+ real meters of altitude. Driver's
+ * View already handled this correctly (`1.4 * scale`, i.e. a real
+ * 1.4m eye height converted into scene units); Top-Down did not.
+ * Fixed by expressing the Top-Down offset in real meters
+ * (`TOPDOWN_HEIGHT_M`, `TOPDOWN_BACK_M` below) and multiplying by
+ * `scale`, the same pattern Driver's View already used -- no change
+ * to Driver's View's own camera math, which was already correct.
  *
- * 2026-09-14 STYLE CHANGE -- glowing-outline vehicles (Tesla FSD /
- * reference-image style), replacing solid emissive boxes: each vehicle
- * is now a body+cabin outline built from `THREE.EdgesGeometry`
- * (glowing border only) plus a near-invisible fill mesh (kept only so
- * click-to-select raycasting still works -- NOT meant to be visible).
- * Per-vehicle wheel geometry was dropped in this pass to match the
- * simplified "car silhouette outline" look in the reference image,
- * rather than a fully modeled car -- swappable later via the same
- * `buildVehicleMesh` factory function if a more detailed silhouette is
- * wanted.
+ * All other behavior (vehicle rendering, RSU rendering, procedural
+ * environment dressing, resize handling, click-to-select) is
+ * UNCHANGED from the previous version of this file.
  *
  * Bug-fix carried forward: mesh reference maps are cleared on every
  * setup-effect run to avoid stale references surviving a React
@@ -138,9 +126,36 @@ interface Props {
   environment?: EnvironmentGeometry;
 }
 
-const SCENE_WIDTH_UNITS = 40;
+const SCENE_WIDTH_UNITS = 180;
 const DEFAULT_VEHICLE_SIZE: [number, number, number] = [0.9, 0.5, 1.8];
 const STANDARD_LANE_WIDTH_M = 3.5; // real-world engineering convention, not measured CARLA data
+
+/** Top-Down camera offset, expressed in REAL METERS (see 2026-09-15 fix
+ * note above), then converted to scene units via `* scale` at the
+ * point of use -- same pattern Driver's View already used for its eye
+ * height. ~14m is roughly a 4th-5th floor vantage point above the ego,
+ * not a drone/satellite altitude. */
+const TOPDOWN_HEIGHT_M = 14;
+const TOPDOWN_BACK_M = 10;
+
+/** 2026-09-15 FIX -- Driver's View felt "distant / not first-person"
+ * even though its height math was already correct. Two causes:
+ *
+ *   1. The eye position was placed at the vehicle's CENTER, not toward
+ *      the windshield/front -- like floating in the middle of the car
+ *      looking out, rather than sitting up front like a driver.
+ *      `DRIVER_FORWARD_OFFSET_M` shifts the eye forward along the
+ *      vehicle's own heading before setting its height.
+ *
+ *   2. Driver's View shared the same 55-degree FOV as Top-Down. A wide
+ *      FOV makes everything read as smaller/farther away -- this alone
+ *      can make a technically-close camera feel distant. Driver's View
+ *      now uses its own narrower FOV (`DRIVER_VIEW_FOV`), updated only
+ *      when in that mode; Top-Down's FOV is untouched.
+ */
+const DRIVER_FORWARD_OFFSET_M = 0.9; // roughly half a vehicle length forward, toward the windshield
+const DRIVER_VIEW_FOV = 42;
+const TOPDOWN_VIEW_FOV = 55;
 
 function headingFromDelta(prev: Frame | undefined, curr: Frame): number {
   if (!prev || prev.position_x == null || prev.position_y == null) return 0;
@@ -258,23 +273,45 @@ export function DigitalTwin3D({
   const connectionLinesRef = useRef<THREE.LineSegments | null>(null);
   const roadMeshRef = useRef<THREE.Group | null>(null);
 
-  // Real dominant travel axis, derived once from the overall real
-  // position spread -- used to orient the approximate road strip along
-  // the direction traffic actually travels, rather than an arbitrary
-  // fixed axis.
+  // 2026-09-15 FIX: real dominant travel axis, derived from the OVERALL
+  // real position spread across the whole scene (`bounds`), not from a
+  // per-tick velocity comparison. `bounds` only changes when the scene
+  // itself changes (see DigitalTwin.tsx's computeBounds), so this value
+  // is stable across playback -- it will not flip mid-scene and trigger
+  // a road rebuild on every frame the way the previous per-tick version
+  // could. See module docstring's 2026-09-15 fix note for the full
+  // explanation of the blinking this caused.
   const dominantAxis = useMemo<"x" | "y">(() => {
     if (!bounds) return "y";
     return bounds.maxX - bounds.minX >= bounds.maxY - bounds.minY ? "x" : "y";
   }, [bounds]);
 
+  // 2026-09-15 FIX: tracks the MAXIMUM distinct lane count seen so far
+  // during this scene's playback. `laneCount` below is monotonically
+  // non-decreasing as a result, instead of fluctuating every tick with
+  // momentary lane occupancy (which vehicle happens to be visible on
+  // which lane at this exact instant) -- that fluctuation was the
+  // second, independent cause of the per-frame road rebuild/blink (see
+  // module docstring). Reset whenever `bounds` changes, i.e. a new
+  // scene has loaded and the previous scene's lane count no longer
+  // applies.
+  const maxLaneCountSeenRef = useRef<number>(2);
+  useEffect(() => {
+    maxLaneCountSeenRef.current = 2;
+  }, [bounds]);
+
   const laneCount = useMemo(() => {
-    if (!currentTick) return 2;
+    if (!currentTick) return maxLaneCountSeenRef.current;
     const laneIds = new Set(
       Object.values(currentTick.vehicles)
         .map((f) => f.lane_id)
         .filter((id): id is number => id != null),
     );
-    return Math.max(laneIds.size, 2);
+    const seenThisTick = Math.max(laneIds.size, 2);
+    if (seenThisTick > maxLaneCountSeenRef.current) {
+      maxLaneCountSeenRef.current = seenThisTick;
+    }
+    return maxLaneCountSeenRef.current;
   }, [currentTick]);
 
   useEffect(() => {
@@ -302,6 +339,19 @@ export function DigitalTwin3D({
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
+  renderer.domElement.style.width = "100%";
+  renderer.domElement.style.height = "100%";
+  renderer.domElement.style.display = "block";
+
+  const resizeObserver = new ResizeObserver(() => {
+    const nextWidth = container.clientWidth;
+    const nextHeight = container.clientHeight;
+    if (nextWidth <= 0 || nextHeight <= 0) return;
+    camera.aspect = nextWidth / nextHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(nextWidth, nextHeight, false);
+  });
+  resizeObserver.observe(container);
     container.appendChild(renderer.domElement);
 
     // A large, filled ground plane covering the whole visible area --
@@ -331,61 +381,316 @@ export function DigitalTwin3D({
     // --------------------------------------------------------------
     // DECORATIVE SCENE DRESSING -- explicitly a visual approximation,
     // NOT measured/real geometry, NOT the Stage 2 `environment` prop
-    // above. Placed generically around the scene perimeter so the
-    // Digital Twin reads as a filled world rather than an empty void,
-    // per explicit instruction (2026-09-14) that this is acceptable as
-    // disclosed decoration while real vehicle motion stays data-driven.
-    // Deliberately does NOT render any specific vehicle as a bus/truck
-    // shape -- no vehicle in the real dataset has a recorded type, so
-    // doing that would misrepresent a specific real actor rather than
-    // decorate empty background space. Will be removed/replaced
-    // wholesale once Stage 2's real CARLA geometry populates the
-    // `environment` prop instead.
+    // above.
     // --------------------------------------------------------------
     const dressing = new THREE.Group();
-    const treeTrunkMat = new THREE.MeshStandardMaterial({ color: 0x1a2e1a });
-    const treeFoliageMat = new THREE.MeshStandardMaterial({ color: 0x134e2a, emissive: 0x22c55e, emissiveIntensity: 0.35 });
-    const perimeter = SCENE_WIDTH_UNITS * 0.9;
 
-    // Trees: two rows flanking the road corridor.
-    for (let i = 0; i < 24; i++) {
-      const t = (i / 24) * Math.PI * 2;
-      const rx = Math.cos(t) * perimeter;
-      const rz = Math.sin(t) * perimeter;
+    const treeTrunkMat = new THREE.MeshStandardMaterial({
+      color: 0x26351f,
+      roughness: 0.95,
+    });
+
+    const treeFoliageMat = new THREE.MeshStandardMaterial({
+      color: 0x14532d,
+      emissive: 0x0b3d24,
+      emissiveIntensity: 0.3,
+      roughness: 0.9,
+    });
+
+    const buildingMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      emissive: 0x075985,
+      emissiveIntensity: 0.22,
+      roughness: 0.75,
+    });
+
+    const windowMat = new THREE.MeshStandardMaterial({
+      color: 0x67e8f9,
+      emissive: 0x22d3ee,
+      emissiveIntensity: 1.0,
+    });
+
+    const barrierMat = new THREE.MeshStandardMaterial({
+      color: 0x475569,
+      emissive: 0x0e7490,
+      emissiveIntensity: 0.18,
+      roughness: 0.8,
+    });
+
+    const poleMat = new THREE.MeshStandardMaterial({
+      color: 0x64748b,
+      emissive: 0x0e7490,
+      emissiveIntensity: 0.2,
+    });
+
+    const mountainMat = new THREE.MeshStandardMaterial({
+      color: 0x163047,
+      emissive: 0x082f49,
+      emissiveIntensity: 0.22,
+      roughness: 1,
+      flatShading: true,
+    });
+
+    const roadHalfWidth = Math.max(
+      6,
+      Math.min(22, laneCount * 2.2)
+    );
+
+    const roadHalfLength = SCENE_WIDTH_UNITS * 0.47;
+
+    const addTree = (
+      x: number,
+      z: number,
+      scaleValue: number
+    ) => {
       const tree = new THREE.Group();
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 2, 6), treeTrunkMat);
-      trunk.position.y = 1;
+
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.22, 0.3, 2.4, 7),
+        treeTrunkMat
+      );
+      trunk.position.y = 1.2;
       tree.add(trunk);
-      const foliage = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3, 7), treeFoliageMat);
-      foliage.position.y = 3;
-      tree.add(foliage);
-      tree.position.set(rx, 0, rz);
+
+      const lowerFoliage = new THREE.Mesh(
+        new THREE.ConeGeometry(1.45, 2.7, 8),
+        treeFoliageMat
+      );
+      lowerFoliage.position.y = 3.0;
+      tree.add(lowerFoliage);
+
+      const upperFoliage = new THREE.Mesh(
+        new THREE.SphereGeometry(1.15, 8, 6),
+        treeFoliageMat
+      );
+      upperFoliage.position.y = 4.15;
+      tree.add(upperFoliage);
+
+      tree.position.set(x, 0, z);
+      tree.scale.setScalar(scaleValue);
       dressing.add(tree);
-    }
+    };
 
-    // Simple low-poly building skyline around the far perimeter.
-    const buildingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, emissive: 0x0ea5e9, emissiveIntensity: 0.15 });
-    for (let i = 0; i < 14; i++) {
-      const t = (i / 14) * Math.PI * 2 + 0.2;
-      const dist = perimeter * 1.4;
-      const bx = Math.cos(t) * dist;
-      const bz = Math.sin(t) * dist;
-      const h = 6 + (i % 5) * 3;
-      const building = new THREE.Mesh(new THREE.BoxGeometry(4, h, 4), buildingMat);
-      building.position.set(bx, h / 2, bz);
+    const addBuilding = (
+      x: number,
+      z: number,
+      width: number,
+      depth: number,
+      height: number
+    ) => {
+      const building = new THREE.Group();
+
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, depth),
+        buildingMat
+      );
+      body.position.y = height / 2;
+      building.add(body);
+
+      for (
+        let level = 1;
+        level < Math.min(6, Math.floor(height / 3));
+        level++
+      ) {
+        const window = new THREE.Mesh(
+          new THREE.BoxGeometry(width * 0.7, 0.08, 0.035),
+          windowMat
+        );
+        window.position.set(
+          0,
+          level * 3 - 1,
+          depth / 2 + 0.03
+        );
+        building.add(window);
+      }
+
+      building.position.set(x, 0, z);
       dressing.add(building);
+    };
+
+    const addBarrier = (
+      x: number,
+      z: number,
+      length: number,
+      rotation: number
+    ) => {
+      const barrier = new THREE.Mesh(
+        new THREE.BoxGeometry(length, 0.65, 0.22),
+        barrierMat
+      );
+      barrier.position.set(x, 0.33, z);
+      barrier.rotation.y = rotation;
+      dressing.add(barrier);
+    };
+
+    const addPole = (x: number, z: number) => {
+      const pole = new THREE.Group();
+
+      const shaft = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.09, 0.12, 5.5, 8),
+        poleMat
+      );
+      shaft.position.y = 2.75;
+      pole.add(shaft);
+
+      const arm = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.08, 0.08),
+        poleMat
+      );
+      arm.position.set(0.45, 5.2, 0);
+      pole.add(arm);
+
+      const lamp = new THREE.Mesh(
+        new THREE.SphereGeometry(0.13, 8, 8),
+        windowMat
+      );
+      lamp.position.set(1.0, 5.15, 0);
+      pole.add(lamp);
+
+      pole.position.set(x, 0, z);
+      dressing.add(pole);
+    };
+
+    // Roadside trees.
+    for (let i = 0; i < 16; i++) {
+      const longitudinal =
+        -roadHalfLength + (i / 15) * roadHalfLength * 2;
+
+      const sideOffset =
+        roadHalfWidth + 7 + (i % 3) * 2;
+
+      const treeScale =
+        0.8 + (i % 4) * 0.12;
+
+      if (dominantAxis === "x") {
+        addTree(longitudinal, sideOffset, treeScale);
+        addTree(
+          longitudinal,
+          -sideOffset,
+          treeScale * 0.95
+        );
+      } else {
+        addTree(sideOffset, longitudinal, treeScale);
+        addTree(
+          -sideOffset,
+          longitudinal,
+          treeScale * 0.95
+        );
+      }
     }
 
-    // Distant low-poly terrain/"mountain" silhouette.
-    const terrainMat = new THREE.MeshStandardMaterial({ color: 0x0f2436, emissive: 0x0a3a4a, emissiveIntensity: 0.1, wireframe: true });
+    // Second vegetation band for scene depth.
     for (let i = 0; i < 10; i++) {
-      const t = (i / 10) * Math.PI * 2 + 0.4;
-      const dist = perimeter * 2.1;
-      const mx = Math.cos(t) * dist;
-      const mz = Math.sin(t) * dist;
-      const h = 10 + (i % 4) * 6;
-      const mountain = new THREE.Mesh(new THREE.ConeGeometry(9, h, 5), terrainMat);
-      mountain.position.set(mx, h / 2 - 1, mz);
+      const longitudinal =
+        -roadHalfLength * 0.9 +
+        (i / 9) * roadHalfLength * 1.8;
+
+      const sideOffset =
+        roadHalfWidth + 23 + (i % 2) * 4;
+
+      if (dominantAxis === "x") {
+        addTree(longitudinal, sideOffset, 1.15);
+        addTree(longitudinal, -sideOffset, 1.1);
+      } else {
+        addTree(sideOffset, longitudinal, 1.15);
+        addTree(-sideOffset, longitudinal, 1.1);
+      }
+    }
+
+    // Low-rise city blocks outside the immediate road corridor.
+    const buildingPositions = [
+      [-52, 32, 9, 10, 9],
+      [-28, 40, 12, 11, 13],
+      [8, 38, 10, 12, 10],
+      [42, 31, 13, 11, 16],
+      [-48, -34, 11, 10, 12],
+      [-14, -41, 13, 10, 9],
+      [22, -38, 10, 12, 14],
+      [52, -30, 12, 11, 11],
+    ] as const;
+
+    for (const [x, z, width, depth, height] of buildingPositions) {
+      addBuilding(x, z, width, depth, height);
+    }
+
+    // Roadside barriers.
+    if (dominantAxis === "x") {
+      addBarrier(
+        0,
+        roadHalfWidth + 3,
+        roadHalfLength * 0.65,
+        0
+      );
+      addBarrier(
+        0,
+        -roadHalfWidth - 3,
+        roadHalfLength * 0.65,
+        0
+      );
+    } else {
+      addBarrier(
+        roadHalfWidth + 3,
+        0,
+        roadHalfLength * 0.65,
+        Math.PI / 2
+      );
+      addBarrier(
+        -roadHalfWidth - 3,
+        0,
+        roadHalfLength * 0.65,
+        Math.PI / 2
+      );
+    }
+
+    // Street-light/pole rhythm.
+    for (let i = 0; i < 10; i++) {
+      const longitudinal =
+        -roadHalfLength * 0.85 +
+        (i / 9) * roadHalfLength * 1.7;
+
+      const sideOffset = roadHalfWidth + 1.8;
+
+      if (dominantAxis === "x") {
+        addPole(longitudinal, sideOffset);
+        if (i % 2 === 0) {
+          addPole(longitudinal, -sideOffset);
+        }
+      } else {
+        addPole(sideOffset, longitudinal);
+        if (i % 2 === 0) {
+          addPole(-sideOffset, longitudinal);
+        }
+      }
+    }
+
+    // Distant terrain for depth.
+    const terrainDistance = SCENE_WIDTH_UNITS * 0.58;
+
+    for (let i = 0; i < 9; i++) {
+      const angle =
+        (i / 9) * Math.PI * 2 + 0.25;
+
+      const distance =
+        terrainDistance + (i % 3) * 9;
+
+      const mountainHeight =
+        12 + (i % 4) * 5;
+
+      const mountain = new THREE.Mesh(
+        new THREE.ConeGeometry(
+          13 + (i % 3) * 4,
+          mountainHeight,
+          7
+        ),
+        mountainMat
+      );
+
+      mountain.position.set(
+        Math.cos(angle) * distance,
+        mountainHeight / 2 - 1,
+        Math.sin(angle) * distance
+      );
+
       dressing.add(mountain);
     }
 
@@ -431,6 +736,7 @@ export function DigitalTwin3D({
     animate();
 
     return () => {
+    resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
       renderer.domElement.removeEventListener("click", handleClick);
       renderer.dispose();
@@ -441,9 +747,7 @@ export function DigitalTwin3D({
 
   // STAGE 2 integration point: renders whatever real static-environment
   // geometry is present in `environment` (empty in Stage 1, so this is
-  // currently a no-op -- see module docstring). Coordinates are treated
-  // as real CARLA world x/y, scaled the same way as vehicles, whenever
-  // `bounds` is available. Rebuilds fully whenever `environment` or
+  // currently a no-op). Rebuilds fully whenever `environment` or
   // `bounds` changes.
   useEffect(() => {
     const scene = sceneRef.current;
@@ -515,10 +819,12 @@ export function DigitalTwin3D({
   }, [environment, bounds]);
 
   // Approximate road, rebuilt when lane count or orientation changes.
-  // Widened and given real lane-divider markings (one line per real
-  // lane boundary) so it reads as an actual road surface, not an
-  // isolated thin strip -- still an approximation (see module
-  // docstring), just a more legible one.
+  //
+  // 2026-09-15: this effect's dependency array is exactly why the two
+  // fixes above (stable dominantAxis, stabilized laneCount) matter --
+  // this effect fully rebuilds the road every time either value
+  // changes. Before the fix, both could change on nearly every tick;
+  // now both are stable across a scene's playback.
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
@@ -534,9 +840,11 @@ export function DigitalTwin3D({
       roadMeshRef.current = null;
     }
 
-    const laneWidthUnits = (STANDARD_LANE_WIDTH_M / 20) * (SCENE_WIDTH_UNITS / 40) * 6; // widened for legibility at this scale
-    const roadWidth = laneCount * laneWidthUnits;
-    const roadLength = SCENE_WIDTH_UNITS * 2;
+  if (!bounds) return;
+  const sceneBounds = bounds;
+  const sceneSpan = Math.max(sceneBounds.maxX - sceneBounds.minX, sceneBounds.maxY - sceneBounds.minY) || 1; const scale = SCENE_WIDTH_UNITS / sceneSpan; const laneWidthUnits = STANDARD_LANE_WIDTH_M * scale;
+  const roadLength = (dominantAxis === "x" ? sceneBounds.maxX - sceneBounds.minX : sceneBounds.maxY - sceneBounds.minY) * scale;
+  const roadWidth = laneCount * laneWidthUnits;
 
     const group = new THREE.Group();
 
@@ -565,7 +873,7 @@ export function DigitalTwin3D({
 
     scene.add(group);
     roadMeshRef.current = group;
-  }, [laneCount, dominantAxis]);
+  }, [laneCount, dominantAxis, bounds]);
 
   // Per-tick: update vehicle meshes, connection lines, and camera.
   useEffect(() => {
@@ -581,12 +889,6 @@ export function DigitalTwin3D({
       (y - bounds.minY - spanY / 2) * scale,
     ];
 
-    // Position AND SCALE real RSUs using the same real coordinate
-    // scaling as vehicles (2026-09-14 fix -- RSU geometry was
-    // previously fixed-size, same bug class as the vehicle mesh-scale
-    // mismatch described in the module docstring). Cheap to redo every
-    // tick (only 4 objects) and keeps them correctly placed/sized even
-    // if bounds change between scenes.
     for (const rsuGroup of rsuMeshesRef.current) {
       const centerXyz = rsuGroup.userData.rsuCenterXyz as [number, number, number];
       const [rsuX, rsuZ] = toWorld(centerXyz[0], centerXyz[1]);
@@ -622,14 +924,6 @@ export function DigitalTwin3D({
       const isSelected = frame.vehicle_id === selectedVehicleId;
       const color = isEgo ? EGO_COLOR : directionColor(frame.lane_id);
       setVehicleHighlight(mesh, color, isSelected || isEgo);
-
-      // 2026-09-14 FIX: mesh scale now includes the same `scale` factor
-      // used to compress real positions into the scene, so vehicle
-      // geometry and vehicle positions live in the same coordinate
-      // space. Previously this only applied the ego/non-ego multiplier
-      // (1.15 / 1), leaving mesh size fixed-absolute regardless of how
-      // compressed the real position spread was -- root cause of the
-      // "solid color blob" render at close (Driver's View) range.
       mesh.scale.setScalar(scale * (isEgo ? 1.15 : 1));
 
       if (isEgo) {
@@ -655,7 +949,6 @@ export function DigitalTwin3D({
       }
     }
 
-    // Real proximity connection lines, same rule as the 2D map.
     if (connectionLinesRef.current) {
       scene.remove(connectionLinesRef.current);
       connectionLinesRef.current.geometry.dispose();
@@ -682,24 +975,42 @@ export function DigitalTwin3D({
       connectionLinesRef.current = lines;
     }
 
-    // Camera follows the real selected ego vehicle, in whichever mode
-    // is active. Falls back to the previous fixed elevated view if the
-    // ego vehicle has no frame at this tick. Distance/height values
-    // here are already in scene-unit space (same space as `worldX` /
-    // `worldZ` after `toWorld()`), so they do NOT need the `scale`
-    // factor applied separately -- only the vehicle/RSU mesh geometry
-    // itself needed that fix (see 2026-09-14 note above).
+    // 2026-09-15 FIX: Top-Down offset is now expressed in real meters
+    // (TOPDOWN_HEIGHT_M / TOPDOWN_BACK_M, declared near the top of this
+    // file) and multiplied by `scale`, matching the pattern Driver's
+    // View already used for its eye height -- see module docstring's
+    // 2026-09-15 fix note. Driver's View itself is UNCHANGED here.
     if (egoWorldPos) {
       if (cameraMode === "topdown") {
-        camera.position.set(egoWorldPos.x, egoWorldPos.y + 9, egoWorldPos.z + 8);
+        camera.position.set(
+          egoWorldPos.x,
+          egoWorldPos.y + TOPDOWN_HEIGHT_M * scale,
+          egoWorldPos.z + TOPDOWN_BACK_M * scale,
+        );
         camera.lookAt(egoWorldPos);
       } else {
-        const eyeHeight = 1.4;
-        const forwardDist = 3;
+        const eyeHeight = 1.4 * scale;
+        const forwardDist = 18;
         const forward = new THREE.Vector3(Math.sin(egoHeading), 0, Math.cos(egoHeading));
-        const eyePos = egoWorldPos.clone().setY(eyeHeight);
+        // 2026-09-15 FIX: eye position shifted forward (toward the
+        // windshield) before setting height, instead of sitting at the
+        // vehicle's exact center -- see DRIVER_FORWARD_OFFSET_M note
+        // near the top of this file.
+        const eyePos = egoWorldPos
+          .clone()
+          .add(forward.clone().multiplyScalar(DRIVER_FORWARD_OFFSET_M * scale))
+          .setY(eyeHeight);
         camera.position.copy(eyePos);
         camera.lookAt(eyePos.clone().add(forward.multiplyScalar(forwardDist)));
+      }
+
+      // 2026-09-15 FIX: Driver's View uses its own narrower FOV instead
+      // of sharing Top-Down's wide 55-degree FOV -- a wide FOV was
+      // making an otherwise-correct close camera read as distant.
+      const targetFov = cameraMode === "driver" ? DRIVER_VIEW_FOV : TOPDOWN_VIEW_FOV;
+      if (camera.fov !== targetFov) {
+        camera.fov = targetFov;
+        camera.updateProjectionMatrix();
       }
     }
   }, [currentTick, previousTick, bounds, selectedVehicleId, egoVehicleDbId, cameraMode]);

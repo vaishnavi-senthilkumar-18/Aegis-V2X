@@ -30,3 +30,8 @@ results/*
 
 # OS
 .DS_Store
+dashboard.zip
+dashboard/DigitalTwin_full_backup.txt
+dashboard/backups/
+dashboard/public/camera_frames/
+dashboard/public/camera_frames_manifest.before-roundabout-merge.json

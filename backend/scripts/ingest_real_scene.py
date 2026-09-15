@@ -1,4 +1,4 @@
-﻿"""One-off script: ingest a real Phase 2 CARLA scene into the database.
+"""One-off script: ingest a real Phase 2 CARLA scene into the database.
 
 Usage (from the `backend/` directory, with the venv activated):
 
@@ -46,10 +46,10 @@ from app.services.carla_ingestion import assemble_scene_payloads, discover_vehic
 # with robocopy, then point this at the local copy.
 # ---------------------------------------------------------------------------
 SCENE_DIR = Path(
-    r"C:\AegisTemp\straight_road_dense_clear_day_Scene00"
+    r"C:\AegisTemp\roundabout_scene00_FULL\roundabout_sparse_night_Scene00"
 )
-SCENE_CODE = "straight_road_dense_clear_day_Scene00"
-MAP_NAME = "Town05"  # adjust if you know the actual CARLA map used
+SCENE_CODE = "roundabout_sparse_night_Scene00"
+MAP_NAME = "Town04"  # adjust if you know the actual CARLA map used
 # ---------------------------------------------------------------------------
 
 BULK_BATCH_SIZE = 2000
