@@ -8,6 +8,143 @@ ongoing, dated project-status log going forward. Newest entries first.
 
 ---
 
+## 2026-09-20 — GDCA-only ablation: Authority arm vs. neutral control
+
+**Recorded by:** Claude Code (Vaishnavi's session)
+
+### What this is
+
+An **ablation** of the already-committed GDCA → TAHS substitution
+experiment (`ai/twintrust_ap/gdca_tahs_experiment.py`, commit `6dad0ee`),
+per the 2026-09-20 Phase 5 architecture review's recommended next
+experiment. Adds an explicit control arm to answer the question that
+experiment alone could not: does GDCA Authority actually change TAHS's
+horizon decision relative to a neutral/no-signal baseline, or does it
+only "propagate" without doing anything distinguishable from a fixed
+input?
+
+### Neutral control value
+
+`0.5` — the midpoint of TAHS's documented `trust ∈ [0,1]` domain.
+Justification (not invented, grounded in existing repository evidence):
+`trust=0.0` already carries a specific, strongly negative meaning in
+TAHS's own semantics ("zero trust"), so it cannot serve as "no
+information." `configs/model.yaml`'s `trust_estimator.calibration_bins`
+independently labels the `[0.4, 0.6]` band "moderate confidence" on the
+same `[0,1]` scale — the repository's own calibration scheme already
+treats the region around 0.5 as neutral, not the extremes.
+
+### Real trajectory (same as the committed experiment, unchanged)
+
+`straight_road_dense_clear_day_Scene00`, `Vehicle147`, 92 real frames →
+90 authority rows (window=5, identical mechanism). Authority range
+`[0.0, 0.99931920]`. 0 NaN, 0 Inf. Naive zero-order-hold baseline,
+unchanged — no trained Digital-Twin predictor exists in this
+repository.
+
+### Results (270 rows = 90 authority × 3 criticality)
+
+- **Equal vs. different:** 94 rows with `gdca_horizon == control_horizon`,
+  **176 rows with `gdca_horizon != control_horizon`.**
+- **horizon_delta distribution:** `{-3: 87, -2: 87, 0: 94, 3: 2}`.
+- **By criticality:**
+  - `criticality=0.0`: 87/90 rows differ (all `delta=-3`), 3 equal.
+  - `criticality=0.5`: only 2/90 rows differ (both `delta=+3`), 88 equal.
+  - `criticality=1.0`: 87/90 rows differ (all `delta=-2`), 3 equal.
+  - **The effect persists across all 3 controlled criticality values**
+    (nonzero deltas exist at every level), but its *magnitude and
+    frequency* differ sharply by criticality — explained below, not
+    left as an unexplained empirical curiosity.
+
+### Is this mathematically expected? (required scientific check)
+
+Yes — verified by direct continuous-horizon computation
+(`H = 1 + 9·sigmoid(trust − criticality)`, β=γ=1) before nearest-value
+discretization onto `{1,2,3,5,8,10}`:
+
+| | trust | criticality | continuous H | nearest discrete |
+|---|---|---|---|---|
+| control | 0.5 | 0.0 | 6.602 | **8** |
+| GDCA (authority≈0, most frames) | 0.0 | 0.0 | 5.5 | **5** → delta -3 |
+| control | 0.5 | 0.5 | 5.5 | **5** |
+| GDCA (authority≈0.999, 2 frames) | 0.999 | 0.5 | 6.601 | **8** → delta +3 |
+| control | 0.5 | 1.0 | 4.398 | **5** |
+| GDCA (authority≈0, most frames) | 0.0 | 1.0 | 3.42 | **3** → delta -2 |
+
+The pattern is fully explained by where each arm's continuous `H` value
+falls relative to the discretization set's bucket boundaries: at
+`criticality=0.5`, the control's own continuous value (5.5) sits almost
+exactly at the boundary already assigned to bucket `5`, and the
+trajectory's authority values (mostly near 0, since the naive baseline
+fails during the real acceleration phase) also map to bucket `5` there
+— so only the 2 frames with authority ≳0.99 push far enough to cross
+into bucket `8`. At `criticality=0.0` and `1.0`, the control's own
+continuous value already sits closer to a *different* bucket (`8` and
+`5` respectively) than where the trajectory's mostly-near-zero authority
+values land (`5` and `3` respectively) — producing a large, consistent,
+whole-bucket difference for nearly every frame. **This is a
+discretization-coarseness effect interacting with where 0.5 happens to
+land relative to the 6-value bucket set at each criticality — not an
+anomaly, and not evidence the experiment or GDCA is broken.**
+
+### Tests
+
+`tests/unit/test_gdca_tahs_ablation.py` (new, 16 tests, synthetic/offline
+— no live backend dependency): neutral-value justification/sanity,
+control-arm/GDCA-arm cross-checked against direct `TAHS` calls,
+`horizon_delta` correctness, field labeling (`authority_as_trust_substitution`,
+never bare `trust`; explicit arm labels), discretization/determinism,
+and both directions of the TAHS-monotonicity-derived expectation
+(authority above/below the neutral value never producing a
+shorter/longer horizon than control, respectively) with two
+hand-verified concrete cases.
+
+**Result: 16/16 passed.**
+
+### Regression
+
+- `tests/unit/test_gdca.py`: **53/53 passed** (unchanged).
+- `tests/unit/test_tahs_monotonicity.py`: **13/13 passed** (unchanged).
+- `tests/unit/test_gdca_tahs_substitution_experiment.py`: **14/14
+  passed** (unchanged — not modified).
+- Full suite: **259 passed, 2 skipped (pre-existing Mitsuba skips), 0
+  failed** (243 prior + 16 new).
+- `git diff --check`: clean.
+
+### What this ablation DOES establish
+
+- GDCA Authority **is not inert relative to a neutral baseline** —
+  176/270 (65%) of real-data rows produce a horizon genuinely different
+  from the neutral control, and the effect is present (though variable
+  in magnitude) at every one of the 3 controlled criticality values.
+- The observed differences are **fully explained by TAHS's own
+  documented formula and discretization**, not by any change to TAHS or
+  GDCA's mathematics (neither was modified).
+
+### What this ablation does NOT establish
+
+- Does NOT prove GDCA improves prediction, communication, or control
+  performance (same boundary as the substitution experiment).
+- Does NOT constitute a comparison against a trained Digital-Twin
+  predictor — the naive persistence baseline is unchanged.
+- Does NOT use or validate real Trust or Criticality evidence — the
+  0.0/0.5/1.0 criticality values remain controlled experimental
+  constants, and `ai.trust_estimator`/`ai.criticality` are not imported
+  anywhere in this module.
+- Does NOT touch FSDP in any way.
+- Does NOT establish that the *magnitude* of GDCA's effect (bucket
+  jumps of 2-3 discrete horizon steps) is itself meaningful or
+  desirable — only that it is real, nonzero, and mathematically
+  traceable to the existing formula.
+
+### Files
+
+- `ai/twintrust_ap/gdca_tahs_ablation.py` (new)
+- `tests/unit/test_gdca_tahs_ablation.py` (new)
+- `ai/twintrust_ap/gdca_tahs_experiment.py` and
+  `tests/unit/test_gdca_tahs_substitution_experiment.py`: **unchanged**,
+  reused only via import (`compute_real_authority_sequence`).
+
 ## 2026-09-19 (latest) — GDCA-only → TAHS substitution experiment (Option E)
 
 **Recorded by:** Claude Code (Vaishnavi's session)
