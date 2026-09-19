@@ -8,6 +8,145 @@ ongoing, dated project-status log going forward. Newest entries first.
 
 ---
 
+## 2026-09-19 (latest) — GDCA-only → TAHS substitution experiment (Option E)
+
+**Recorded by:** Claude Code (Vaishnavi's session)
+
+### Experiment name
+
+GDCA-only → TAHS via Option E substitution, per the 2026-09-19
+Trust/GDCA/Criticality/TAHS/FSDP architecture design review's
+recommendation (see the design-review entry, earlier in this log).
+
+### Why substitution is being used
+
+`ai/trust_estimator/`'s `estimate(state)` always raises
+`MissingTrustEvidenceError` — real Trust evidence is structurally
+unavailable on every real CARLA scene today (no real CSI/SNR, no
+authoritative `comm_quality` formula). TAHS's `select_horizon(trust,
+criticality)` interface is otherwise idle on real data. Rather than
+leaving GDCA's Authority permanently disconnected from any decision
+(the design review's "is GDCA just an isolated metric" objection), this
+experiment passes Authority through TAHS's existing `trust` parameter
+**as an explicitly logged substitution only** — every result row is
+named `authority_as_trust_substitution`, never `trust`. `TAHS` and
+`ai/trust_estimator/` are both imported and used completely unmodified.
+
+### Real dataset used
+
+- Scene: `straight_road_dense_clear_day_Scene00`
+  (`scene_id=6b08be32-e041-4ab4-861c-99090df77ffb`)
+- Vehicle: `Vehicle147`
+- 92 real frames (real `position_x/y/z`, live backend query)
+- 90 authority rows after the rolling-window warm-up (same mechanism,
+  same window=5, as the prior GDCA real-data checkpoint)
+
+### Naive persistence limitation (unchanged)
+
+The "predicted state" is still the explicitly-labeled naive
+zero-order-hold baseline (`predicted_state(t) = observed_state(t-1)`) —
+no trained Digital-Twin predictor exists anywhere in this repository.
+This limitation is unchanged from the original GDCA real-data
+demonstration and applies identically here.
+
+### Criticality controlled values
+
+`[0.0, 0.5, 1.0]` — explicit experimental control constants, **not**
+real Criticality Estimator output (`ai/criticality/` is untouched and
+unused in this experiment; it remains structurally unavailable on real
+data for the same reasons as Trust).
+
+### Horizon behavior (real data)
+
+- 270 total rows (90 authority values × 3 criticality values).
+- Authority range: `[0.00000000, 0.99931920]` (identical to the prior
+  GDCA-only checkpoint, same code, same data). 0 NaN, 0 Inf.
+- Horizon range observed: `{3, 5, 8}` (a subset of the full discrete set
+  `{1,2,3,5,8,10}` — the real Authority sequence's own numeric range on
+  this trajectory did not happen to exercise every discretized horizon
+  value; discretization itself was still respected for every row).
+- Horizon distribution: `{3: 87, 5: 178, 8: 5}`.
+- Concrete contrast: frame `121537` (stationary phase, Authority
+  `0.999319`), criticality `0.5` → horizon `8`. Frame `122407`
+  (accelerating phase, Authority `0.0`), criticality `0.5` → horizon `5`
+  — the higher-authority, stationary-phase frame produced the longer
+  horizon, as expected.
+
+### Validation results
+
+- Authority bounded in `[0,1]`: confirmed for all 90 real values.
+- No NaN/Inf: confirmed (0 occurrences).
+- Horizon within configured `[1,10]`: confirmed for all 270 rows.
+- **Higher Authority never produced a shorter horizon** for fixed
+  criticality: checked across all 270 real rows — **0 violations**.
+- **Higher Criticality never produced a longer horizon** for fixed
+  Authority: checked across all 270 real rows (grouped by frame) — **0
+  violations**.
+- Horizon discretization (`{1,2,3,5,8,10}`) respected: confirmed.
+- Determinism: confirmed (same inputs reproduce identical rows;
+  `compute_real_authority_sequence`/`run_gdca_tahs_substitution_experiment`
+  are pure functions).
+- Stationary (high-authority) vs. accelerating (low-authority) periods:
+  confirmed the stationary-phase frame produced a longer horizon than
+  the accelerating-phase frame at matched criticality (see concrete
+  contrast above).
+
+### Tests
+
+`tests/unit/test_gdca_tahs_substitution_experiment.py` (new, 14 tests,
+synthetic/offline — no live backend dependency, keeping the full suite
+reproducible): authority boundedness, no-NaN/Inf, determinism, explicit
+`authority_as_trust_substitution` field-name labeling (never `trust`),
+horizon discretization/range, use of the real unmodified `TAHS` class,
+and both required monotonicity invariants (authority↑ ⇒ horizon
+never-decreases; criticality↑ ⇒ horizon never-increases).
+
+**Result: 14/14 passed.**
+
+### Regression
+
+- `tests/unit/test_tahs_monotonicity.py`: **13/13 passed** (unchanged).
+- `tests/unit/test_gdca.py`: **53/53 passed** (unchanged).
+- Full suite (`pytest tests/unit -v`): **243 passed, 2 skipped
+  (pre-existing Mitsuba skips), 0 failed** (229 prior + 14 new).
+- `git diff --check`: clean.
+
+### What this experiment DOES establish
+
+- The existing, unmodified GDCA Authority score, computed from real
+  position data, CAN meaningfully drive the existing, unmodified TAHS
+  horizon mechanism when substituted into its `trust` slot — horizons
+  respond sensibly (longer for high-authority/stationary evidence,
+  shorter for low-authority/accelerating evidence) and both documented
+  TAHS invariants (monotonic in trust, monotonic in criticality) hold
+  exactly on this real sequence, with zero violations.
+- The substitution is mechanically sound: no interface change, no
+  numerical instability, fully deterministic.
+
+### What this experiment DOES NOT establish
+
+- Does NOT prove GDCA improves prediction, communication, or control
+  performance.
+- Does NOT constitute an empirical comparison between Trust and GDCA
+  (Trust remains structurally inert on real data — no such comparison is
+  currently possible).
+- Does NOT validate Criticality on real data (the 3 values used are
+  controlled experimental constants, not measurements).
+- Does NOT validate end-to-end Aegis-V2X performance.
+- Does NOT claim GDCA is universally novel.
+
+### Explicit boundary statements
+
+- **Authority is NOT being redefined as Trust.** `ai/trust_estimator/`
+  is untouched; every experiment row uses the field name
+  `authority_as_trust_substitution`, never `trust`.
+- **The long-term 3-input TAHS architecture (Option C from the design
+  review) remains pending** — not implemented, not started. `BaseTAHS`'s
+  interface is unchanged (`select_horizon(trust: float, criticality:
+  float) -> int`).
+- **FSDP remains blocked** — `models/fsdp_policy_table.json` still does
+  not exist; this experiment does not touch FSDP in any way.
+
 ## 2026-09-19 (latest) — GDCA formulation corrected (Case Y / Case G fixes)
 
 **Recorded by:** Claude Code (Vaishnavi's session)
