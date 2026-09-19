@@ -1,0 +1,15 @@
+{
+  "captured_demo": true,
+  "scene_code": "straight_road_dense_clear_day_Scene00",
+  "frame_index": 122407,
+  "total_vehicles": 46,
+  "valid_lidar_vehicles": 45,
+  "excluded_vehicles": ["Vehicle192"],
+  "excluded_vehicle_reason": "Real LiDAR file corrupted (lidar_points=None)",
+  "pointpillars_vehicle_count": 45,
+  "pointpillars_output_shape": [1, 128, 90, 180],
+  "v2x_vit_input_vehicle_count": 45,
+  "v2x_vit_output_shape": [1, 256],
+  "finite": true,
+  "deterministic": true
+}
