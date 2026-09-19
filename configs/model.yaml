@@ -51,8 +51,20 @@ fsdp:
 
 perception:
   pointpillars:
-    voxel_size: [0.16, 0.16, 4.0]
-    point_cloud_range: [0, -39.68, -3, 69.12, 39.68, 1]
+    # Empirically derived from the real Aegis-V2X Phase 2 LiDAR dataset
+    # (straight_road_dense_clear_day_Scene00 + roundabout_sparse_night_Scene00,
+    # ~62M real points, percentile-based p0.1-p99.9 envelope; 99.421% real-point
+    # retention). This is NOT the original KITTI/PointPillars reference range,
+    # and it is NOT confirmed against any Aegis-V2X mathematical specification
+    # (03_Mathematical_Formulation/04_Novel_Algorithm_Design are unrecoverable
+    # -- see Phase 4 LiDAR coordinate investigation). No semantic axis meaning
+    # (forward/right/up, ego frame, vehicle frame) is asserted for x/y/z --
+    # these bounds describe the empirically observed Aegis LiDAR frame only,
+    # exactly as recorded, with no rotation/translation/sign-flip applied.
+    # Valid for isolated PointPillars feature extraction only; NOT yet
+    # approved for V2X-ViT cooperative fusion or Digital Twin/world alignment.
+    voxel_size: [0.16, 0.16, 19.68]
+    point_cloud_range: [-115.07, -57.43, -3.39, -0.04, 0.00, 16.29]
   v2x_vit:
     embed_dim: 256
     num_heads: 8
