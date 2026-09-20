@@ -27,7 +27,7 @@ Example` docstring convention mandated in
 - `ai.criticality.base.BaseCriticalityEstimator`
   - `estimate(state) -> float`
 - `ai.twintrust_ap.tahs.BaseTAHS`
-  - `select_horizon(trust, criticality) -> int`
+  - `select_horizon(trust, criticality, authority=0.0) -> int`
 - `ai.twintrust_ap.fsdp.BaseFSDP`
   - `discretize(trust, criticality) -> (TrustBin, CriticalityBin)`
   - `lookup_action(trust_bin, criticality_bin) -> CommunicationAction`
@@ -44,7 +44,13 @@ Example` docstring convention mandated in
 ## Invariants Implementers Must Preserve
 
 1. **Boundedness** — trust and criticality outputs must lie in `[0, 1]`.
-2. **Monotonicity** — for fixed criticality, `T1 > T2 => H1 >= H2` (TAHS).
+2. **Monotonicity** (TAHS) — extended in Phase 5 to all three inputs
+   (`authority` is GDCA's Authority score, `ai/twintrust_ap/gdca.py`;
+   defaults to 0.0, the additive identity, so two-input callers are
+   unaffected):
+   - for fixed criticality and authority, `T1 > T2 => H1 >= H2`
+   - for fixed trust and authority, `C1 > C2 => H1 <= H2`
+   - for fixed trust and criticality, `A1 > A2 => H1 >= H2`
 3. **Determinism** — FSDP must return the same action for the same
    `(trust_bin, criticality_bin)` pair.
 

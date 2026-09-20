@@ -29,12 +29,13 @@ criticality_estimator:
     traffic_density: 0.15
 
 tahs:
-  # H_t = H_min + (H_max - H_min) * sigmoid(beta*T_t - gamma*C_t)
+  # H_t = H_min + (H_max - H_min) * sigmoid(beta*T_t - gamma*C_t + delta*A_t)
   horizon_min: 1
   horizon_max: 10
   horizon_discretization: [1, 2, 3, 5, 8, 10]
   beta: 1.0   # trust sensitivity
   gamma: 1.0  # criticality sensitivity
+  delta: 1.0  # GDCA authority sensitivity -- PROVISIONAL/UNCALIBRATED architectural default (Phase 5 three-input extension), not optimized or empirically validated
 
 fsdp:
   trust_bins: ["low", "medium", "high"]
