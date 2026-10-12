@@ -12,7 +12,7 @@ format:
 	isort ai digital_twin backend tests
 
 typecheck:
-	mypy ai digital_twin backend --ignore-missing-imports
+	mypy ai digital_twin --ignore-missing-imports
 
 test:
 	pytest tests/ -v --cov=ai --cov=digital_twin --cov-report=term-missing

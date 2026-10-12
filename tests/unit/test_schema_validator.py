@@ -5,19 +5,38 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from simulation.dataset_pipeline.schema import DatasetSample, TrafficDensity, WeatherCondition, build_sample_id
+from simulation.dataset_pipeline.schema import (
+    DatasetSample,
+    TrafficDensity,
+    WeatherCondition,
+    build_sample_id,
+)
 from simulation.dataset_pipeline.validator import DatasetValidator
 
 
 def _make_sample(**overrides) -> DatasetSample:
     defaults = dict(
-        sample=build_sample_id("Scene00", 1, 1), scene_id="Scene00", frame_id=1, vehicle_id=1, timestamp=0.1,
-        lidar="synchronized/Scene00/x.npz", gps=(1.0, 2.0, 10.0),
-        imu=((0.0, 0.0, 9.8), (0.0, 0.0, 0.0)), speed=10.0,
-        csi="synchronized/Scene00/x.npz", snr=20.0, rssi=-60.0, path_loss=90.0, beam_index=5,
-        traffic_density=TrafficDensity.DENSE, weather=WeatherCondition.CLEAR_DAY,
-        ground_truth_future_csi=0.5, ground_truth_future_beam=6,
-        ground_truth_trust=0.8, ground_truth_criticality=0.2, sync_offset_ms=3.0,
+        sample=build_sample_id("Scene00", 1, 1),
+        scene_id="Scene00",
+        frame_id=1,
+        vehicle_id=1,
+        timestamp=0.1,
+        lidar="synchronized/Scene00/x.npz",
+        gps=(1.0, 2.0, 10.0),
+        imu=((0.0, 0.0, 9.8), (0.0, 0.0, 0.0)),
+        speed=10.0,
+        csi="synchronized/Scene00/x.npz",
+        snr=20.0,
+        rssi=-60.0,
+        path_loss=90.0,
+        beam_index=5,
+        traffic_density=TrafficDensity.DENSE,
+        weather=WeatherCondition.CLEAR_DAY,
+        ground_truth_future_csi=0.5,
+        ground_truth_future_beam=6,
+        ground_truth_trust=0.8,
+        ground_truth_criticality=0.2,
+        sync_offset_ms=3.0,
     )
     defaults.update(overrides)
     return DatasetSample(**defaults)
@@ -84,8 +103,9 @@ def test_validator_passes_clean_dataset():
 
 def test_validator_array_payload_flags_short_lidar_and_nan_csi():
     validator = DatasetValidator(min_lidar_points=1000)
-    issues = validator.validate_array_payload("Scene00_Vehicle01_Frame000001",
-                                               np.zeros((10, 4)), np.array([np.nan + 0j]))
+    issues = validator.validate_array_payload(
+        "Scene00_Vehicle01_Frame000001", np.zeros((10, 4)), np.array([np.nan + 0j])
+    )
     categories = {i.category for i in issues}
     assert "lidar_completeness" in categories
     assert "csi_integrity" in categories
